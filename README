@@ -1,0 +1,45 @@
+This is Business::OnlinePayment::CyberSource, a Business::OnlinePayment
+backend module for CyberSource.  Information about CyberSource is available at
+their website: http://www.cybersource.com
+
+This module currently implements the 1.0.0 version of the Simple Order API 
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+To successfully run the tests, you will need to have the CyberSource Simple
+Order API installed, and a working cybs.ini.  Copy the cybs.ini to the 
+build directory.
+
+This module requires these other modules and libraries:
+
+  Simple Order API Perl (cybs)
+  http://apps.cybersource.com/cgi-bin/pages/get_dir_dev_api.cgi?kit=Simple_Order_API_Perl
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Peter Bowen
+
+Written from nearly scratch, but based loosely on the Authorize.net module.
+
+Business::OnlinePayment (required) is a generic interface for processing payments through
+online credit card processors, online check acceptance houses, etc.  (If you
+like buzzwords, call it an "multiplatform ecommerce-enabling middleware
+solution").
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+
+
+
