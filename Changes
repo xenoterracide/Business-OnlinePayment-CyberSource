@@ -3,5 +3,14 @@ Revision history for Perl extension Business::OnlinePayment::CyberSource..
 0.01  Wed Jan 26 14:06:19 MST 2005
 	- original version; created by hand.
 
-0.02 Mon Jan 31 11:34:27 MST 2005
+0.02  Mon Jan 31 11:34:27 MST 2005
         - First Release - 
+
+0.03  Thurs Jun 16 2005
+        - Ivan tested this and it was pretty broken.
+        - Fixed the regexp for expiration date so that it works (Ivan patch)
+                - Modified it slightly to allow for dates w/o slashes
+        - Allowed for custom cybs.ini locations (Ivan Patch)
+                - Made the default /etc/ as opposed to ./
+        - Added a ton of error handling after Ivan had cats over the poor error handling before
+         

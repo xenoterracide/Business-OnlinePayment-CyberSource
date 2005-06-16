@@ -12,7 +12,7 @@ require Exporter;
 @ISA = qw(Exporter AutoLoader Business::OnlinePayment);
 @EXPORT = qw();
 @EXPORT_OK = qw();
-$VERSION = '0.02';
+$VERSION = '0.03';
 
 # ACTION MAP
 my @action_list = ('ccAuthService_run', 'ccAuthReversalService_run',
@@ -44,9 +44,10 @@ my %card_types = ('visa'               => '001',
 sub set_defaults {
   my $self = shift;
   my $startup = {};
-  my $confFile = './cybs.ini';
+  # The default is /etc/
+  my $conf_file = ( $self->can('conf_file') && $self->conf_file ) || '/etc/cybs.ini';
 
-  my %config = cybs::cybs_load_config( $confFile );
+  my %config = &cybs::cybs_load_config( $conf_file );
 
   $self->{'_config'} = \%config;
 
@@ -168,7 +169,7 @@ sub submit {
                     AMEX_Data3          => 'invoiceHeader_amexDataTAA3',
                     AMEX_Data4          => 'invoiceHeader_amexDataTAA4',
                     fraud_threshold     => 'businessRules_scoreThreshold',
-                    order_number          => 'request_id',
+                    order_number        => 'request_id',
                    );
 
   my %request = $self->get_fields( qw( purchaseTotals_currency
@@ -187,9 +188,11 @@ sub submit {
 
   #Split up the expiration
   if (defined($content->{'expiration'})) {
-    $content->{'expiration'} =~ m|^(\d{2})/+(\d{2,4})$|;
-    $request->{'card_expirationMonth'} = sprintf("%02s", $1);
-    $request->{'card_expirationYear'} = sprintf("%02s", substr($2,-2));
+    # This works for MM/YYYY, MM/YY, MMYYYY, and MMYY
+    $content->{'expiration'} =~ /^(\d+)\D*\d*(\d{2})$/
+      or croak "unparsable expiration ". $content->{expiration};
+    $request->{'card_expirationMonth'} = $1;
+    $request->{'card_expirationYear'} = $2;
   }
 
   $self->_set_item_list($content, $request);
@@ -244,8 +247,22 @@ sub submit {
   ##### 
   ###Here's the Magic
   #####
-  cybs::cybs_run_transaction($config, $request, $reply);
+  my $cybs_return_code = &cybs::cybs_run_transaction($config, $request, $reply);
 
+  if ( $cybs_return_code != &cybs::CYBS_S_OK ) {
+    $self->is_success(0);
+    if ( $cybs_return_code == &cybs::CYBS_S_PERL_PARAM_ERROR ) {
+      $self->error_message("A parsing error occurred - there is a problem with one or more of the parameters.");
+    } elsif ( $cybs_return_code == &cybs::CYBS_S_PRE_SEND_ERROR ) {
+      $self->error_message("Could not create the request - There is probably an error with your client configuration. More Information:" . $reply->{&cybs::CYBS_SK_ERROR_INFO});
+    } elsif ( $cybs_return_code == &cybs::CYBS_S_PRE_SEND_ERROR ) {
+      $self->error_message("Something bad happened while sending. More Information:" . $reply->{&cybs::CYBS_SK_ERROR_INFO});
+     } else {
+      $self->error_message('Something REALLY bad happened. Your transaction may have been processed or it could have blown up.  Check the business center to figure it out. Good Luck... More Information:' .$reply->{&cybs::CYBS_SK_ERROR_INFO} . ' Raw Error:' . $reply->{&cybs::CYBS_SK_RAW_REPLY} . ' Probable Request ID:' . $reply->{&cybs::CYBS_SK_FAULT_REQUEST_ID});
+    }
+    return 0;
+  }
+  
   # Fields for all queries
   $self->server_response($reply);
   $self->order_number($reply->{'requestID'});
@@ -255,7 +272,7 @@ sub submit {
     $self->is_success(1);
   } else {
     $self->is_success(0);
-    $self->error_message($self->result_code);
+    $self->error_message($error_handler->get_text($self->result_code));
   }
 
   my $ccAuthHash = {};
@@ -282,6 +299,7 @@ sub submit {
     $self->avs_code($reply->{'ccAuthReply_avsCode'});
     $self->authorization($reply->{'ccAuthReply_authorizationCode'});
     $self->auth_reply($ccAuthHash);
+#    $self->request_id($reply->{'requestID'});
   }
   if ($request->{'ccAuthReversalService_run'} eq 'true') {
     $self->auth_reversal_reply($ccAuthReversalHash);
@@ -295,6 +313,7 @@ sub submit {
   if ($request->{'afsService_run'} eq 'true') {
     $self->afs_reply($afsHash);
   }
+  return $self->is_success;
 }
 
 sub _set_item_list {
@@ -372,7 +391,8 @@ Business::OnlinePayment::CyberSource - CyberSource backend for Business::OnlineP
   # One step transaction, the simple case.
   ####
 
-  my $tx = new Business::OnlinePayment("");
+  my $tx = new Business::OnlinePayment("CyberSource",
+                                       conf_file => '/path/to/cybs.ini'");
   $tx->content(
              type           => 'VISA',
              action         => 'Normal Authorization',
@@ -416,7 +436,8 @@ Business::OnlinePayment::CyberSource - CyberSource backend for Business::OnlineP
   # process in one step as above.
   ####
 
-  my $tx = new Business::OnlinePayment("AuthorizeNet");
+  my $tx = new Business::OnlinePayment("CyberSource",
+                                       conf_file => '/path/to/cybs.ini'");
   $tx->content(
              type           => 'VISA',
              action         => 'Authorization Only',
@@ -494,6 +515,9 @@ For detailed information see L<Business::OnlinePayment>.
 
 =head1 NOTE
 
+The cybs.ini default home is /etc/cybs.ini - if you would prefer it to 
+live someplace else specify that in the new.
+
 Unlike Business::OnlinePayment, Business::OnlinePayment::CyberSource
 requires separate first_name and last_name fields.
 
@@ -516,6 +540,13 @@ This module implements the Simple Order API 1.0 from Cybersource.
 Peter Bowen peter-cybersource@bowenfamily.org
 
 Based on  L<Business::OnlinePayment::AuthorizeNet>
+
+=head1 THANK YOU
+
+Jason Kohles - For writing BOP - I didn't have to create my own framework.
+
+Ivan Kohler - Tested the first pre-release version and fixed a number of bugs.
+              He also encouraged me to add better error reporting for system errors.
 
 =head1 SEE ALSO
 

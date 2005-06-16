@@ -7,8 +7,8 @@ WriteMakefile(
     'AUTHOR'       => 'Peter Bowen <pbowen@corp.untd.com>',     #really just
                                                                 #the maintainer
     #'NORECURS'     => 1, # dont descend into subdirectories
-    'PREREQ_PM'    => { 'cybs' => 0,
-                        'Business::OnlinePayment' => 0,
+    'PREREQ_PM'    => { 'cybs' => '0',
+                        'Business::OnlinePayment' => '0',
                       },
     #'dist'         => {CI => 'ci -l'},
 );

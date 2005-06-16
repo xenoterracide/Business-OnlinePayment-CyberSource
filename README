@@ -16,8 +16,7 @@ To install this module type the following:
 DEPENDENCIES
 
 To successfully run the tests, you will need to have the CyberSource Simple
-Order API installed, and a working cybs.ini.  Copy the cybs.ini to the 
-build directory.
+Order API installed, and a working cybs.ini installed in the /etc directory.
 
 This module requires these other modules and libraries:
 
