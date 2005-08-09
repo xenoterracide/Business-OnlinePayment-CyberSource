@@ -14,3 +14,5 @@ Revision history for Perl extension Business::OnlinePayment::CyberSource..
                 - Made the default /etc/ as opposed to ./
         - Added a ton of error handling after Ivan had cats over the poor error handling before
          
+0.04  Tues Aug 9 2005
+        - Found a bug that allowed the system to point to production even if the cybs.conf said to use dev

@@ -12,7 +12,7 @@ require Exporter;
 @ISA = qw(Exporter AutoLoader Business::OnlinePayment);
 @EXPORT = qw();
 @EXPORT_OK = qw();
-$VERSION = '0.03';
+$VERSION = '0.04';
 
 # ACTION MAP
 my @action_list = ('ccAuthService_run', 'ccAuthReversalService_run',
@@ -243,7 +243,13 @@ sub submit {
     }
   }
 
-  $config->{'sendToProduction'} = $self->test_transaction()?"false":"true";
+  # Configuration should always take over!  There's nothing so confusing as having the config show test and
+  # it still sends to live
+  if (lc($config->{'sendToProduction'}) eq 'true' ||
+      $config->{'sendToProduction'} eq '') {
+    $config->{'sendToProduction'} = $self->test_transaction()?"false":"true";
+  }
+
   ##### 
   ###Here's the Magic
   #####
