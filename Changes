@@ -16,3 +16,6 @@ Revision history for Perl extension Business::OnlinePayment::CyberSource..
          
 0.04  Tues Aug 9 2005
         - Found a bug that allowed the system to point to production even if the cybs.conf said to use dev
+
+0.05  Mon Oct 2 2005
+        - Set the defaults for the business logic settings using the cybs.ini

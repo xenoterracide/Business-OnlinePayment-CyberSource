@@ -12,7 +12,7 @@ require Exporter;
 @ISA = qw(Exporter AutoLoader Business::OnlinePayment);
 @EXPORT = qw();
 @EXPORT_OK = qw();
-$VERSION = '0.04';
+$VERSION = '0.05';
 
 # ACTION MAP
 my @action_list = ('ccAuthService_run', 'ccAuthReversalService_run',
@@ -161,7 +161,7 @@ sub submit {
                     xid               => 'ccAuthService_xid',
                     eci_raw           => 'ccAouthService_eciRaw',
                     avs_decline_flags => 'businessRules_declineAVSFlags',
-                    avs_ignore_flags  => 'businessRules_ignoreAVSFlags',
+                    avs_ignore_result => 'businessRules_ignoreAVSResult',
                     capture_anyway    => 'businessRules_ignoreCVResult',
                     merchant_descriptor => 'invoiceHeader_merchantDescriptor',
                     AMEX_Data1          => 'invoiceHeader_amexDataTAA1',
@@ -248,6 +248,17 @@ sub submit {
   if (lc($config->{'sendToProduction'}) eq 'true' ||
       $config->{'sendToProduction'} eq '') {
     $config->{'sendToProduction'} = $self->test_transaction()?"false":"true";
+  }
+
+  # Use the configuration values for some of the business logic - However, let the request override these...
+  if (!defined($request->{'businessRules_declineAVSFlags'}) && defined($config->{'businessRules_declineAVSFlags'}) ) {
+    $request->{'businessRules_declineAVSFlags'} = $config->{'businessRules_declineAVSFlags'};
+  }
+  if (!defined($request->{'businessRules_ignoreAVSResult'}) && defined($config->{'businessRules_ignoreAVSResult'}) ) {
+    $request->{'businessRules_ignoreAVSResult'} = $config->{'businessRules_ignoreAVSResult'};
+  }
+  if (!defined($request->{'businessRules_ignoreCVResult'}) && defined($config->{'businessRules_ignoreCVResult'}) ) {
+    $request->{'businessRules_ignoreCVResult'} = $config->{'businessRules_ignoreCVResult'}
   }
 
   ##### 
@@ -524,6 +535,21 @@ For detailed information see L<Business::OnlinePayment>.
 The cybs.ini default home is /etc/cybs.ini - if you would prefer it to 
 live someplace else specify that in the new.
 
+A few notes on cybs.ini - most settings can be overwritten by the submit 
+call - except for the following exceptions:
+
+  sendToProduction 
+  From a systems perspective, this should be hard so that there is NO 
+confusion as to which server the request goes against.
+
+You can set the business rules from th ini - the following rules are supported
+
+  businessRules_declineAVSFlags
+
+  businessRules_ignoreAVSResult
+
+  businessRules_ignoreCVResult
+
 Unlike Business::OnlinePayment, Business::OnlinePayment::CyberSource
 requires separate first_name and last_name fields.
 
@@ -543,7 +569,7 @@ This module implements the Simple Order API 1.0 from Cybersource.
 
 =head1 AUTHOR
 
-Peter Bowen peter-cybersource@bowenfamily.org
+Peter Bowen peter@bowenfamily.org
 
 Based on  L<Business::OnlinePayment::AuthorizeNet>
 
