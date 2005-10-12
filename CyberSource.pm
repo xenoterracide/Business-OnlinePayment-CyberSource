@@ -12,7 +12,7 @@ require Exporter;
 @ISA = qw(Exporter AutoLoader Business::OnlinePayment);
 @EXPORT = qw();
 @EXPORT_OK = qw();
-$VERSION = '0.05';
+$VERSION = '0.06';
 
 # ACTION MAP
 my @action_list = ('ccAuthService_run', 'ccAuthReversalService_run',
@@ -361,7 +361,8 @@ sub _set_item_list {
         &Carp::croak("Item " . $item->{'number'} . " has no unit_price");
       }
     } 
-  } elsif (defined($content->{'amount'}) && $content->{'amount'} ne '') {
+  }
+  if (defined($content->{'amount'}) && $content->{'amount'} ne '') {
     if (defined($content->{'freight'}) && $content->{'freight'} ne '') {
       $request->{'purchaseTotals_freightAmount'} = $content->{'freight'};
     }
@@ -369,7 +370,9 @@ sub _set_item_list {
       $request->{'purchaseTotals_taxAmount'} = $content->{'tax'};
     }
     $request->{'purchaseTotals_grandTotalAmount'} = $content->{'amount'};
-  } else {
+  } 
+  if ((!defined($content->{'items'}) || scalar($content->{'items'}) < 0) &&  
+      (!defined($content->{'amount'})|| $content->{'amount'} eq '')) {
     &Carp::croak("It's impossible to auth without items or amount populated!");
   }
   

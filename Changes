@@ -19,3 +19,6 @@ Revision history for Perl extension Business::OnlinePayment::CyberSource..
 
 0.05  Mon Oct 2 2005
         - Set the defaults for the business logic settings using the cybs.ini
+
+0.05  Wed Oct 12 2005
+        - Allow both line items and grand total.  If you use both, the grand total will prevail.
