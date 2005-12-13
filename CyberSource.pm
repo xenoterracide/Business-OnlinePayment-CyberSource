@@ -12,7 +12,7 @@ require Exporter;
 @ISA = qw(Exporter AutoLoader Business::OnlinePayment);
 @EXPORT = qw();
 @EXPORT_OK = qw();
-$VERSION = '0.06';
+$VERSION = '0.07';
 
 # ACTION MAP
 my @action_list = ('ccAuthService_run', 'ccAuthReversalService_run',
@@ -417,14 +417,19 @@ Business::OnlinePayment::CyberSource - CyberSource backend for Business::OnlineP
              type           => 'VISA',
              action         => 'Normal Authorization',
              invoice_number => '00000001',
-             items          => [{'number'   => 0,
-                                 'name'     => 'Test 1',
-                                 'quantity' => 1,
+             items          => [{'number'     => 0,
+                                 'name'       => 'Test 1',
+                                 'quantity'   => 1,
                                  'unit_price' => '25.00'},
-                                  {'number'   => 1,
-                                   'name'     => 'Test 2',
-                                   'quantity' => 1,
-                                   'unit_price' => '50.00'},
+                                {'number'     => 1,
+                                 'name'       => 'Test 2',
+                                 'quantity'   => 1,
+                                 'unit_price' => '50.00'},
+                                {'number'     => 3,
+                                 'name'       => '$5 off',
+                                 'type'       => 'COUPON',
+                                 'quantity'   => 1,
+                                 'unit_price' => '5.00'},
                                 ],
              first_name     => 'Peter',
              last_name      => 'Bowen',
@@ -466,10 +471,10 @@ Business::OnlinePayment::CyberSource - CyberSource backend for Business::OnlineP
                                  'name'     => 'iPod Mini',
                                  'quantity' => 1,
                                  'unit_price' => '25.00'},
-                                  {'number'   => 1,
-                                   'name'     => 'Extended Warranty',
-                                   'quantity' => 1,
-                                   'unit_price' => '50.00'},
+                                {'number'   => 1,
+                                 'name'     => 'Extended Warranty',
+                                 'quantity' => 1,
+                                 'unit_price' => '50.00'},
                                 ],
              first_name     => 'Peter',
              last_name      => 'Bowen',
@@ -527,13 +532,17 @@ Business::OnlinePayment::CyberSource - CyberSource backend for Business::OnlineP
 
 Content required: type, login, action, amount, first_name, last_name, card_number, expiration.
 
-TODO - Checks
+=head2 Checks
+
+Currently not supported (TODO)
 
 =head1 DESCRIPTION
 
 For detailed information see L<Business::OnlinePayment>.
 
 =head1 NOTE
+
+=head2 cybs.ini
 
 The cybs.ini default home is /etc/cybs.ini - if you would prefer it to 
 live someplace else specify that in the new.
@@ -542,10 +551,11 @@ A few notes on cybs.ini - most settings can be overwritten by the submit
 call - except for the following exceptions:
 
   sendToProduction 
+
   From a systems perspective, this should be hard so that there is NO 
 confusion as to which server the request goes against.
 
-You can set the business rules from th ini - the following rules are supported
+You can set the business rules from the ini - the following rules are supported
 
   businessRules_declineAVSFlags
 
@@ -553,8 +563,13 @@ You can set the business rules from th ini - the following rules are supported
 
   businessRules_ignoreCVResult
 
+=head2 Full Name vs. First & Last
+
 Unlike Business::OnlinePayment, Business::OnlinePayment::CyberSource
-requires separate first_name and last_name fields.
+requires separate first_name and last_name fields.  I should probably 
+Just split them apart.  If you feel industrious...
+
+=head2 Settling
 
 To settle an authorization-only transaction (where you set action to
 'Authorization Only'), submit the request ID code in the field
@@ -565,10 +580,39 @@ order_number method on the object returned from the authorization.
 You must also submit the amount field with a value less than or equal
 to the amount specified in the original authorization.
 
+=head2 Items
+
+Item fields map as follows:
+
+=over
+
+=item *
+productCode -> type
+
+(adult_content, coupon, default, electronic_good, electronic_software, gift_certificate, handling_only, service, shipping_and_handling, shipping_only, stored_value, subscription)
+
+=item *
+productSKU  -> SKU
+
+=item *
+productName -> name
+
+=item *
+quantity    -> quantity
+
+=item *
+taxAmount   -> tax
+
+=item *
+unitPrice   -> unit_price
+
+=back
+
+See the Cybersource documentation for the significance of these fields (type can be confusing)
+
 =head1 COMPATIBILITY
 
 This module implements the Simple Order API 1.0 from Cybersource.
-
 
 =head1 AUTHOR
 
