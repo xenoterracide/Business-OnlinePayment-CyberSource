@@ -1,4 +1,4 @@
-BEGIN { $| = 1; print "1..1\n"; }
+BEGIN { $| = 2; print "1..2\n"; }
 
 #testing/testing is valid and seems to work...
 
@@ -27,7 +27,10 @@ $tx->submit();
 
 if($tx->is_success()) {
     print "ok 1\n";
+    if(my $security_key = $tx->security_key) {
+      print "ok 2\n";
+    }
 } else {
-    #warn $tx->error_message;
+    warn $tx->error_message;
     print "not ok 1\n";
 }

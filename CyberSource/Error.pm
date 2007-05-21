@@ -3,6 +3,7 @@ package Business::OnlinePayment::CyberSource::Error;
 use strict;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 
+require 5.005;
 require Exporter;
 
 @ISA = qw(Exporter AutoLoader);
@@ -28,25 +29,39 @@ my $error_codes = { '100' => {'Text'   => 'Successful transaction.',
                     '201' => {'Text'   => 'The issuing bank has questions about the request. You do not receive an authorization code programmatically, but you might receive one verbally by calling the processor.',
                               'Action' => 'Call your processor to possibly receive a verbal authorization. For contact phone numbers, refer to your merchant bank information.'},
                     '202' => {'Text'   => 'Expired card.',
-                              'Action' => 'Request a different card or other form of payment.'},
+                              'Action' => 'Request a different card or other form of payment.',
+                              'Status' => 'expired',
+                             },
                     '203' => {'Text'   => 'General decline of the card. No other information provided by the issuing bank.',
-                              'Action' => 'Request a different card or other form of payment.'},
+                              'Action' => 'Request a different card or other form of payment.',
+                              'Status' => 'decline',
+                             },
                     '204' => {'Text'   => 'Insufficient funds in the account.',
-                              'Action' => 'Request a different card or other form of payment.'},
+                              'Action' => 'Request a different card or other form of payment.',
+                              'Status' => 'nsf',
+                             },
                     '205' => {'Text'   => 'Stolen or lost card.',
-                              'Action' => 'Refer the transaction to your customer support center for manual review.'},
+                              'Action' => 'Refer the transaction to your customer support center for manual review.',
+                              'Status' => 'stolen',
+                             },
                     '207' => {'Text'   => 'Issuing bank unavailable.',
                               'Action' => 'Wait a few minutes and resend the request.'},
                     '208' => {'Text'   => 'Inactive card or card not authorized for card-not-present transactions.',
-                              'Action' => 'Request a different card or other form of payment.'},
+                              'Action' => 'Request a different card or other form of payment.',
+                              'Status' => 'inactive',
+                             },
                     '209' => {'Text'   => 'American Express Card Identification Digits (CID) did not match.',
                               'Action' => 'Request a different card or other form of payment.'},
                     '210' => {'Text'   => 'The card has reached the credit limit.',
-                              'Action' => 'Request a different card or other form of payment.'},
+                              'Action' => 'Request a different card or other form of payment.',
+                              'Status' => 'nsf',
+                             },
                     '211' => {'Text'   => 'Invalid card verification number.',
                               'Action' => 'Request a different card or other form of payment.'},
                     '221' => {'Text'   => "The customer matched an entry on the processor's negative file.",
-                              'Action' => 'Review the order and contact the payment processor.'},
+                              'Action' => 'Review the order and contact the payment processor.',
+                              'Status' => 'blacklisted',
+                             },
                     '230' => {'Text'   => 'The authorization request was approved by the issuing bank but declined by CyberSource because it did not pass the card verification (CV) check.',
                               'Action' => 'You can capture the authorization, but consider reviewing the order for the possibility of fraud.'},
                     '231' => {'Text'   => 'Invalid account number.',
@@ -54,7 +69,9 @@ my $error_codes = { '100' => {'Text'   => 'Successful transaction.',
                     '232' => {'Text'   => 'The card type is not accepted by the payment processor.',
                               'Action' => 'Contact your merchant bank to confirm that your account is set up to receive the card in question.'},
                     '233' => {'Text'   => 'General decline by the processor.',
-                              'Action' => 'Request a different card or other form of payment.'},
+                              'Action' => 'Request a different card or other form of payment.',
+                              'Status' => 'decline',
+                             },
                     '234' => {'Text'   => 'There is a problem with your CyberSource merchant configuration.',
                               'Action' => 'Do not resend the request. Contact Customer Support to correct the configuration problem.'},
                     '235' => {'Text'   => 'The requested amount exceeds the originally authorized amount. Occurs, for example, if you try to capture an amount larger than the original authorization amount.',
@@ -80,7 +97,9 @@ my $error_codes = { '100' => {'Text'   => 'Successful transaction.',
                     '510' => {'Text'   => "The authorization request was approved by the issuing bank but declined by CyberSource because it did not pass the Smart Authorization check.",
                               'Action' => "Do not capture the authorization without further review. The Smart Authorization codes give you additional information as to why CyberSource refused the request."},
                     '700' => {'Text'   => "The customer is on a list issued by the U.S. government containing entities with whom trade is restricted.",
-                              'Action' => "Reject the customer's order."},
+                              'Action' => "Reject the customer's order.",
+                              'Status' => 'blacklisted',
+                             },
                   };
 
 my $afs_codes = { 'A' => "Excessive address change. The customer had two or more billing address changes in the last six months.",
@@ -145,6 +164,12 @@ sub get_text {
   return $error_codes->{$error_code}->{'Text'}
 }
 
+sub get_failure_status {
+  my ($self, $error_code) = @_;
+  no warnings 'uninitialized';
+  return $error_codes->{$error_code}->{'Status'};
+}
+
 sub get_action {
   my ($self, $error_code) = @_;
   return $error_codes->{$error_code}->{'Action'}
@@ -172,8 +197,10 @@ Business::OnlinePayment::CyberSource::Error - Error Code class for Business::Onl
 
   my $error_code = 100;
   my $error_decoder = new Business::OnlinePayment::CyberSource::Error;
-  my $error_text = $error_decoder->get_text($error_code);
-  my $error_action = $error_decoder->get_action($error_code);
+
+  my $error_text     = $error_decoder->get_text($error_code);
+  my $failure_status = $error_decoder->get_failure_status($error_code);
+  my $error_action   = $error_decoder->get_action($error_code);
 
 =head1 AUTHOR
 

@@ -12,7 +12,9 @@ Revision history for Perl extension Business::OnlinePayment::CyberSource..
                 - Modified it slightly to allow for dates w/o slashes
         - Allowed for custom cybs.ini locations (Ivan Patch)
                 - Made the default /etc/ as opposed to ./
-        - Added a ton of error handling after Ivan had cats over the poor error handling before
+        - Added a ton of error handling after Ivan had cats over the poor error
+          handling before
+          (Peter is being generous.  I was downright bitchy. -Ivan)
          
 0.04  Tues Aug 9 2005
         - Found a bug that allowed the system to point to production even if the cybs.conf said to use dev
@@ -25,3 +27,15 @@ Revision history for Perl extension Business::OnlinePayment::CyberSource..
 
 0.07  Mon Dec 12 2005
         - Improved the Documentation
+
+0.08  unreleased
+	- This update by Ivan Kohler <ivan-cybersource@420.am>
+	- Add my previous patch against 0.6 to fix an explicitly specified
+          conf_file
+	- Add "failure statuses" with a B:OP pre-3.00_04 workaround
+
+0.09  Thu Mar 1 2007
+  - Updated by Jason Hall (Jayce^) <jayce+cpan@lug-nut.com>
+  - Updated to New Cybersource API
+  - Specifically using the new 'requestToken' field that is necessary
+  - Internal BOP option of 'security_key' to normalize its usage

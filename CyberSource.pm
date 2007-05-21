@@ -12,7 +12,7 @@ require Exporter;
 @ISA = qw(Exporter AutoLoader Business::OnlinePayment);
 @EXPORT = qw();
 @EXPORT_OK = qw();
-$VERSION = '0.07';
+$VERSION = '2.00';
 
 # ACTION MAP
 my @action_list = ('ccAuthService_run', 'ccAuthReversalService_run',
@@ -37,24 +37,35 @@ my %card_types = ('visa'               => '001',
                   'optima'             => '008',
                   );
 
-
+# Requires Request Token List
+my %request_token = (  ccCaptureService_run          =>  'ccCaptureService_authRequestToken',
+                       ccCreditService_run           =>  'ccCreditService_captureRequestToken',
+                       ccAuthReversalService_run     =>  'ccAuthReversalService_authRequestToken',
+                       );
 
 
 
 sub set_defaults {
   my $self = shift;
-  my $startup = {};
+
+  $self->build_subs(qw( order_number avs_code  cvv2_response cavv_response
+                        auth_reply auth_reversal_reply capture_reply
+                        credit_reply afs_reply failure_status security_key request_token
+                     ));
+}
+
+sub load_config {
+  my $self = shift;
+
   # The default is /etc/
-  my $conf_file = ( $self->can('conf_file') && $self->conf_file ) || '/etc/cybs.ini';
+  my $conf_file = ( $self->can('conf_file') && $self->conf_file )
+                  || '/etc/cybs.ini';
 
   my %config = &cybs::cybs_load_config( $conf_file );
 
   $self->{'_config'} = \%config;
-
-  $self->build_subs(qw( order_number avs_code  cvv2_response cavv_response
-                        auth_reply auth_reversal_reply capture_reply credit_reply afs_reply
-                      ));
 }
+
 
 sub map_fields {
     my($self,%map) = @_;
@@ -78,6 +89,7 @@ sub get_fields {
 sub submit {
   my($self) = @_;
 
+  $self->load_config;
   my $config = $self->{'_config'};
   my $content = $self->{'_content'};
 
@@ -170,6 +182,7 @@ sub submit {
                     AMEX_Data4          => 'invoiceHeader_amexDataTAA4',
                     fraud_threshold     => 'businessRules_scoreThreshold',
                     order_number        => 'request_id',
+                    security_key        => 'request_token',
                    );
 
   my %request = $self->get_fields( qw( purchaseTotals_currency
@@ -221,6 +234,8 @@ sub submit {
     if (lc($content->{'ccAuthService_run'}) ne 'true') {
       $self->required_fields(qw(order_number));
       $request->{'ccCaptureService_authRequestID'} = $content->{'request_id'};
+      $self->required_fields(qw(security_key));
+      $request->{ $request_token{'ccCaptureService_run'} } = $content->{'security_key'};
       if (defined($content->{'auth_code'})) {
         $request->{'ccCaptureService_authverbalAuthCode'} = $content->{'auth_code'};
         $request->{'ccCaptureService_authType'} = 'verbal';
@@ -233,13 +248,15 @@ sub submit {
         $content->{'request_id'} ne '') {
       $self->required_fields(qw(request_id));
       $request->{'ccCreditService_captureRequestID'} = $content->{'request_id'};
+      $self->required_fields(qw(security_key));
+      $request->{ $request_token{'ccCreditService_run'} } = $content->{'security_key'};
     } else {
       $self->required_fields(qw(first_name last_name city country email address card_number expiration invoice_number type));
     }
   }
   if (lc($request->{'afsService_run'}) eq 'true') {
     if (!defined($content->{'items'}) || scalar($content->{'items'}) < 1) {
-      &Carp::croak("Advanced Fraud Screen requests require that you populate the items hash.");
+      croak("Advanced Fraud Screen requests require that you populate the items hash.");
     }
   }
 
@@ -284,12 +301,14 @@ sub submit {
   $self->server_response($reply);
   $self->order_number($reply->{'requestID'});
   $self->result_code($reply->{'reasonCode'});
+  $self->security_key($reply->{'requestToken'});
 
   if ($reply->{'decision'} eq 'ACCEPT') {
     $self->is_success(1);
   } else {
     $self->is_success(0);
     $self->error_message($error_handler->get_text($self->result_code));
+    $self->failure_status($error_handler->get_failure_status($self->result_code)); 
   }
 
   my $ccAuthHash = {};
@@ -358,7 +377,7 @@ sub _set_item_list {
       if (defined($item->{'unit_price'}) && $item->{'unit_price'} ne '') {
         $request->{"item_".$item->{'number'}."_unitPrice"} = $item->{'unit_price'};
       } else {
-        &Carp::croak("Item " . $item->{'number'} . " has no unit_price");
+        croak("Item " . $item->{'number'} . " has no unit_price");
       }
     } 
   }
@@ -373,7 +392,7 @@ sub _set_item_list {
   } 
   if ((!defined($content->{'items'}) || scalar($content->{'items'}) < 0) &&  
       (!defined($content->{'amount'})|| $content->{'amount'} eq '')) {
-    &Carp::croak("It's impossible to auth without items or amount populated!");
+    croak("It's impossible to auth without items or amount populated!");
   }
   
   if ($content->{'recurring_billing'}) {
@@ -498,6 +517,7 @@ Business::OnlinePayment::CyberSource - CyberSource backend for Business::OnlineP
       # get information about authorization
       $authorization = $tx->authorization
       $order_number = $tx->order_number;
+      $security_key = $tx->security_key;
       $avs_code = $tx->avs_code; # AVS Response Code
       $cvv2_response = $tx->cvv2_response; # CVV2/CVC2/CID Response Code
       $cavv_response = $tx->cavv_response; # Cardholder Authentication
@@ -512,6 +532,7 @@ Business::OnlinePayment::CyberSource - CyberSource backend for Business::OnlineP
           order_number        => $order_number,
           merchant_descriptor => 'IPOD MINI',
           amount              => '75.00',
+          security_key        => $security_key,
       );
 
       $capture->submit();
@@ -625,7 +646,10 @@ Based on  L<Business::OnlinePayment::AuthorizeNet>
 Jason Kohles - For writing BOP - I didn't have to create my own framework.
 
 Ivan Kohler - Tested the first pre-release version and fixed a number of bugs.
-              He also encouraged me to add better error reporting for system errors.
+              He also encouraged me to add better error reporting for system
+              errors.  He also added failure_status support.
+
+Jason (Jayce^) Hall - Adding Request Token Requirements (Among other significant improvements... )
 
 =head1 SEE ALSO
 
