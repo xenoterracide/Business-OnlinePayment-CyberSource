@@ -1,7 +1,6 @@
 /Business-OnlinePayment-CyberSource*
 .build
 *.swp
-*.bak
 *~
 *.old
 Makefile
