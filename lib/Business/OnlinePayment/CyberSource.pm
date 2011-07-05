@@ -1,18 +1,17 @@
 package Business::OnlinePayment::CyberSource;
-
 use strict;
+BEGIN {
+	# VERSION
+}
 use Carp;
 use Business::OnlinePayment;
 use Business::OnlinePayment::CyberSource::Error;
-use cybs;
+use CyberSource::SOAPI;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 
-require Exporter;
+use parent 'Exporter';
 
-@ISA = qw(Exporter AutoLoader Business::OnlinePayment);
-@EXPORT = qw();
-@EXPORT_OK = qw();
-$VERSION = '2.00';
+our @ISA = qw(Exporter AutoLoader Business::OnlinePayment);
 
 # ACTION MAP
 my @action_list = ('ccAuthService_run', 'ccAuthReversalService_run',

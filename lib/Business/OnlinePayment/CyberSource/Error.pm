@@ -1,15 +1,14 @@
 package Business::OnlinePayment::CyberSource::Error;
-
+use 5.006;
 use strict;
-use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
+BEGIN {
+	# VERSION
+}
+use vars qw(@ISA @EXPORT @EXPORT_OK);
 
-require 5.005;
-require Exporter;
+use parent 'Exporter';
 
-@ISA = qw(Exporter AutoLoader);
-@EXPORT = qw();
-@EXPORT_OK = qw();
-$VERSION = '0.01';
+our @ISA = qw(Exporter AutoLoader);
 
 #ERROR MAP
 my $error_codes = { '100' => {'Text'   => 'Successful transaction.',
