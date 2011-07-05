@@ -638,7 +638,7 @@ sub request_merge {
 
       $capture->submit();
 
-      if($capture->is_success()) { 
+      if($capture->is_success()) {
           print "Card captured successfully: ".$capture->authorization."\n";
       } else {
           print "Card was rejected: ".$capture->error_message."\n";
@@ -666,15 +666,15 @@ For detailed information see L<Business::OnlinePayment>.
 
 =head2 cybs.ini
 
-The cybs.ini default home is /etc/cybs.ini - if you would prefer it to 
+The cybs.ini default home is /etc/cybs.ini - if you would prefer it to
 live someplace else specify that in the new.
 
-A few notes on cybs.ini - most settings can be overwritten by the submit 
+A few notes on cybs.ini - most settings can be overwritten by the submit
 call - except for the following exceptions:
 
-  sendToProduction 
+  sendToProduction
 
-  From a systems perspective, this should be hard so that there is NO 
+  From a systems perspective, this should be hard so that there is NO
 confusion as to which server the request goes against.
 
 You can set the business rules from the ini - the following rules are supported
@@ -688,7 +688,7 @@ You can set the business rules from the ini - the following rules are supported
 =head2 Full Name vs. First & Last
 
 Unlike Business::OnlinePayment, Business::OnlinePayment::CyberSource
-requires separate first_name and last_name fields.  I should probably 
+requires separate first_name and last_name fields.  I should probably
 Just split them apart.  If you feel industrious...
 
 =head2 Settling
