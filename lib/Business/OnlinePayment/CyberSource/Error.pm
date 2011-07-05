@@ -7,8 +7,7 @@ BEGIN {
 use vars qw(@ISA @EXPORT @EXPORT_OK);
 
 use parent 'Exporter';
-
-our @ISA = qw(Exporter AutoLoader);
+use AutoLoader;
 
 #ERROR MAP
 my $error_codes = { '100' => {'Text'   => 'Successful transaction.',
