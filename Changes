@@ -1,41 +1,42 @@
 Revision history for Perl extension Business::OnlinePayment::CyberSource..
 
-0.01  Wed Jan 26 14:06:19 MST 2005
-	- original version; created by hand.
+0.09	2007-03-01
+	- Updated by Jason Hall (Jayce^) <jayce+cpan@lug-nut.com>
+	- Updated to New Cybersource API
+	- Specifically using the new 'requestToken' field that is necessary
+	- Internal BOP option of 'security_key' to normalize its usage
 
-0.02  Mon Jan 31 11:34:27 MST 2005
-        - First Release - 
-
-0.03  Thurs Jun 16 2005
-        - Ivan tested this and it was pretty broken.
-        - Fixed the regexp for expiration date so that it works (Ivan patch)
-                - Modified it slightly to allow for dates w/o slashes
-        - Allowed for custom cybs.ini locations (Ivan Patch)
-                - Made the default /etc/ as opposed to ./
-        - Added a ton of error handling after Ivan had cats over the poor error
-          handling before
-          (Peter is being generous.  I was downright bitchy. -Ivan)
-         
-0.04  Tues Aug 9 2005
-        - Found a bug that allowed the system to point to production even if the cybs.conf said to use dev
-
-0.05  Mon Oct 2 2005
-        - Set the defaults for the business logic settings using the cybs.ini
-
-0.06  Wed Oct 12 2005
-        - Allow both line items and grand total.  If you use both, the grand total will prevail.
-
-0.07  Mon Dec 12 2005
-        - Improved the Documentation
-
-0.08  unreleased
+0.08   2005-12-31
+	- date unrecorded, so I made one up : Caleb Cushing
 	- This update by Ivan Kohler <ivan-cybersource@420.am>
 	- Add my previous patch against 0.6 to fix an explicitly specified
-          conf_file
+	  conf_file
 	- Add "failure statuses" with a B:OP pre-3.00_04 workaround
 
-0.09  Thu Mar 1 2007
-  - Updated by Jason Hall (Jayce^) <jayce+cpan@lug-nut.com>
-  - Updated to New Cybersource API
-  - Specifically using the new 'requestToken' field that is necessary
-  - Internal BOP option of 'security_key' to normalize its usage
+0.07	2005-12-12
+	- Improved the Documentation
+
+0.06	2005-10-12
+	- Allow both line items and grand total.  If you use both, the grand total will prevail.
+
+0.05	2005-10-02
+	- Set the defaults for the business logic settings using the cybs.ini
+
+0.04	2005-08-09
+	- Found a bug that allowed the system to point to production even if the cybs.conf said to use dev
+
+0.03	2005-06-16
+	- Ivan tested this and it was pretty broken.
+	- Fixed the regexp for expiration date so that it works (Ivan patch)
+		- Modified it slightly to allow for dates w/o slashes
+	- Allowed for custom cybs.ini locations (Ivan Patch)
+		- Made the default /etc/ as opposed to ./
+	- Added a ton of error handling after Ivan had cats over the poor error
+	  handling before
+	  (Peter is being generous.  I was downright bitchy. -Ivan)
+
+0.02	2005-01-31
+	- First Release
+
+0.01	2005-01-26
+	- original version; created by hand.
