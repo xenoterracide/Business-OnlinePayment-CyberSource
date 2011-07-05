@@ -324,9 +324,9 @@ sub submit {
 		  $config->{'businessRules_ignoreCVResult'};
 	}
 
-	#####
-	###Here's the Magic
-	#####
+#####
+###Heres the Magic
+#####
 	my $cybs_return_code =
 	  CyberSource::SOAPI::cybs_run_transaction( $config, $request, $reply );
 
