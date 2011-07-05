@@ -184,13 +184,10 @@ sub get_AFS_codes {
 }
 
 1;
-__END__
-
-=head1 NAME
-
-Business::OnlinePayment::CyberSource::Error - Error Code class for Business::OnlinePayment::CyberSource
+# ABSTRACT:  Error Code class for Business::OnlinePayment::CyberSource
 
 =head1 SYNOPSIS
+
   use Business::OnlinePayment::CyberSource::Error;
 
   my $error_code = 100;
@@ -199,10 +196,6 @@ Business::OnlinePayment::CyberSource::Error - Error Code class for Business::Onl
   my $error_text     = $error_decoder->get_text($error_code);
   my $failure_status = $error_decoder->get_failure_status($error_code);
   my $error_action   = $error_decoder->get_action($error_code);
-
-=head1 AUTHOR
-
-Peter Bowen, peter-cybersource@bowenfamily.org
 
 =head1 SEE ALSO
 
