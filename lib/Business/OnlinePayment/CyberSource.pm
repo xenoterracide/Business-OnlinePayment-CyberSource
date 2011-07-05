@@ -107,7 +107,7 @@ sub submit {
 
 
   $content->{'application'} ||= 'Business::OnlinePayment::CyberSource';
-  $content->{'version'} ||= $VERSION;
+  $content->{'version'} ||= $Business::OnlinePayment::VERSION;
   $self->map_fields(application   => 'clientApplication',
                     version       => 'clientApplicationVersion',
                     user          => 'clientApplicationUser',
