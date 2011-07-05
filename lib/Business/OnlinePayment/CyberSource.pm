@@ -413,8 +413,6 @@ sub request_merge {
 }
 
 1;
-__END__
-
 # ABSTRACT: CyberSource backend for Business::OnlinePayment
 
 =head1 SYNOPSIS
