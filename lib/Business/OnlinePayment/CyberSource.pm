@@ -296,9 +296,10 @@ sub submit {
 
 # Configuration should always take over!  There's nothing so confusing as having the config show test and
 # it still sends to live
-	if ( lc( $config->{'sendToProduction'} ) eq 'true'
+	if (  $config->{'sendToProduction'
+		&& ( lc( $config->{'sendToProduction'} ) eq 'true'
 		|| $config->{'sendToProduction'} eq '' )
-	{
+	) {
 		$config->{'sendToProduction'} =
 		  $self->test_transaction() ? "false" : "true";
 	}
