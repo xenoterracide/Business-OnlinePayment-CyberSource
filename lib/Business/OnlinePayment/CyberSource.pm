@@ -8,9 +8,8 @@ use Business::OnlinePayment;
 use Business::OnlinePayment::CyberSource::Error;
 use CyberSource::SOAPI;
 
-use parent qw(Exporter);
+use parent qw(Exporter Business::OnlinePayment);
 use AutoLoader;
-use Business::OnlinePayment;
 
 # ACTION MAP
 my @action_list = ('ccAuthService_run', 'ccAuthReversalService_run',
