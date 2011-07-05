@@ -289,22 +289,27 @@ sub submit {
 			|| scalar( $content->{'items'} ) < 1 )
 		{
 			croak(
-"Advanced Fraud Screen requests require that you populate the items hash."
+				'Advanced Fraud Screen requests require that you populate'
+				. ' the items hash.'
 			);
 		}
 	}
 
 # Configuration should always take over!  There's nothing so confusing as having the config show test and
 # it still sends to live
-	if (  $config->{'sendToProduction'
+
+	if (
+		$config->{'sendToProduction'}
 		&& ( lc( $config->{'sendToProduction'} ) eq 'true'
 		|| $config->{'sendToProduction'} eq '' )
 	) {
-		$config->{'sendToProduction'} =
-		  $self->test_transaction() ? "false" : "true";
+		$config->{'sendToProduction'}
+			= $self->test_transaction() ? "false" : "true"
+			;
 	}
-
+#
 # Use the configuration values for some of the business logic - However, let the request override these...
+#
 	if (  !defined( $request->{'businessRules_declineAVSFlags'} )
 		&& defined( $config->{'businessRules_declineAVSFlags'} ) )
 	{
@@ -336,7 +341,8 @@ sub submit {
 			$cybs_return_code == CyberSource::SOAPI::CYBS_S_PERL_PARAM_ERROR )
 		{
 			$self->error_message(
-"A parsing error occurred - there is a problem with one or more of the parameters."
+				'A parsing error occurred '
+				. '- there is a problem with one or more of the parameters.'
 			);
 		}
 		elsif (
