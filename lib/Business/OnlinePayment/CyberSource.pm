@@ -415,9 +415,7 @@ sub request_merge {
 1;
 __END__
 
-=head1 NAME
-
-Business::OnlinePayment::CyberSource - CyberSource backend for Business::OnlinePayment
+# ABSTRACT: CyberSource backend for Business::OnlinePayment
 
 =head1 SYNOPSIS
 
@@ -630,13 +628,7 @@ See the Cybersource documentation for the significance of these fields (type can
 
 =head1 COMPATIBILITY
 
-This module implements the Simple Order API 1.0 from Cybersource.
-
-=head1 AUTHOR
-
-Peter Bowen peter@bowenfamily.org
-
-Based on  L<Business::OnlinePayment::AuthorizeNet>
+This module implements the Simple Order API 5.0 from Cybersource.
 
 =head1 THANK YOU
 
