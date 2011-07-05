@@ -7,11 +7,8 @@ use Carp;
 use Business::OnlinePayment;
 use Business::OnlinePayment::CyberSource::Error;
 use CyberSource::SOAPI;
-use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 
-use parent 'Exporter';
-
-our @ISA = qw(Exporter AutoLoader Business::OnlinePayment);
+use parent qw(Exporter AutoLoader Business::OnlinePayment);
 
 # ACTION MAP
 my @action_list = ('ccAuthService_run', 'ccAuthReversalService_run',
