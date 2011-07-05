@@ -57,7 +57,7 @@ sub load_config {
   my $conf_file = ( $self->can('conf_file') && $self->conf_file )
                   || '/etc/cybs.ini';
 
-  my %config = &cybs::cybs_load_config( $conf_file );
+  my %config = CyberSource::SOAPI::cybs_load_config( $conf_file );
 
   $self->{'_config'} = \%config;
 }
@@ -277,18 +277,18 @@ sub submit {
   ##### 
   ###Here's the Magic
   #####
-  my $cybs_return_code = &cybs::cybs_run_transaction($config, $request, $reply);
+  my $cybs_return_code = CyberSource::SOAPI::cybs_run_transaction($config, $request, $reply);
 
-  if ( $cybs_return_code != &cybs::CYBS_S_OK ) {
+  if ( $cybs_return_code != CyberSource::SOAPI::CYBS_S_OK ) {
     $self->is_success(0);
-    if ( $cybs_return_code == &cybs::CYBS_S_PERL_PARAM_ERROR ) {
+    if ( $cybs_return_code == CyberSource::SOAPI::CYBS_S_PERL_PARAM_ERROR ) {
       $self->error_message("A parsing error occurred - there is a problem with one or more of the parameters.");
-    } elsif ( $cybs_return_code == &cybs::CYBS_S_PRE_SEND_ERROR ) {
-      $self->error_message("Could not create the request - There is probably an error with your client configuration. More Information:" . $reply->{&cybs::CYBS_SK_ERROR_INFO});
-    } elsif ( $cybs_return_code == &cybs::CYBS_S_PRE_SEND_ERROR ) {
-      $self->error_message("Something bad happened while sending. More Information:" . $reply->{&cybs::CYBS_SK_ERROR_INFO});
+    } elsif ( $cybs_return_code == CyberSource::SOAPI::CYBS_S_PRE_SEND_ERROR ) {
+      $self->error_message("Could not create the request - There is probably an error with your client configuration. More Information:" . $reply->{CyberSource::SOAPI::CYBS_SK_ERROR_INFO});
+    } elsif ( $cybs_return_code == CyberSource::SOAPI::CYBS_S_PRE_SEND_ERROR ) {
+      $self->error_message("Something bad happened while sending. More Information:" . $reply->{CyberSource::SOAPI::CYBS_SK_ERROR_INFO});
      } else {
-      $self->error_message('Something REALLY bad happened. Your transaction may have been processed or it could have blown up.  Check the business center to figure it out. Good Luck... More Information:' .$reply->{&cybs::CYBS_SK_ERROR_INFO} . ' Raw Error:' . $reply->{&cybs::CYBS_SK_RAW_REPLY} . ' Probable Request ID:' . $reply->{&cybs::CYBS_SK_FAULT_REQUEST_ID});
+      $self->error_message('Something REALLY bad happened. Your transaction may have been processed or it could have blown up.  Check the business center to figure it out. Good Luck... More Information:' .$reply->{CyberSource::SOAPI::CYBS_SK_ERROR_INFO} . ' Raw Error:' . $reply->{&cybs::CYBS_SK_RAW_REPLY} . ' Probable Request ID:' . $reply->{&cybs::CYBS_SK_FAULT_REQUEST_ID});
     }
     return 0;
   }
