@@ -1,8 +1,7 @@
 package Business::OnlinePayment::CyberSource;
+use 5.006;
 use strict;
-
 BEGIN {
-
 	# VERSION
 }
 use Carp;
