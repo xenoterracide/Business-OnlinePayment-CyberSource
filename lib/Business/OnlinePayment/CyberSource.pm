@@ -648,6 +648,38 @@ sub request_merge {
       print "Card was rejected: ".$tx->error_message."\n";
   }
 
+=head1 DESCRIPTION
+
+For detailed information see L<Business::OnlinePayment>.
+
+=head1 API
+
+=over 4
+
+=item C<load_config()>
+
+loads C<cybs.ini>
+
+=item C<map_fields>
+
+=item C<request_merge>
+
+=item C<set_defaults>
+
+=item C<get_AFS_codes>
+
+=item C<get_AVS_Text>
+
+=item C<get_action>
+
+=item C<get_failure_status>
+
+=item C<get_text>
+
+=item C<new>
+
+=back
+
 =head1 SUPPORTED TRANSACTION TYPES
 
 =head2 Visa, MasterCard, American Express, Discover
@@ -657,10 +689,6 @@ Content required: type, login, action, amount, first_name, last_name, card_numbe
 =head2 Checks
 
 Currently not supported (TODO)
-
-=head1 DESCRIPTION
-
-For detailed information see L<Business::OnlinePayment>.
 
 =head1 NOTE
 
