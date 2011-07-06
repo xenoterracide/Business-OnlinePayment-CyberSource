@@ -702,7 +702,7 @@ call - except for the following exceptions:
 
   sendToProduction
 
-  From a systems perspective, this should be hard so that there is NO
+From a systems perspective, this should be hard so that there is NO
 confusion as to which server the request goes against.
 
 You can set the business rules from the ini - the following rules are supported
@@ -737,23 +737,29 @@ Item fields map as follows:
 =over
 
 =item *
+
 productCode -> type
 
 (adult_content, coupon, default, electronic_good, electronic_software, gift_certificate, handling_only, service, shipping_and_handling, shipping_only, stored_value, subscription)
 
 =item *
+
 productSKU  -> SKU
 
 =item *
+
 productName -> name
 
 =item *
+
 quantity    -> quantity
 
 =item *
+
 taxAmount   -> tax
 
 =item *
+
 unitPrice   -> unit_price
 
 =back
@@ -766,13 +772,23 @@ This module implements the Simple Order API 5.0 from Cybersource.
 
 =head1 THANK YOU
 
-Jason Kohles - For writing BOP - I didn't have to create my own framework.
+=over 4
 
-Ivan Kohler - Tested the first pre-release version and fixed a number of bugs.
-              He also encouraged me to add better error reporting for system
-              errors.  He also added failure_status support.
+=item Jason Kohles
 
-Jason (Jayce^) Hall - Adding Request Token Requirements (Among other significant improvements... )
+For writing BOP - I didn't have to create my own framework.
+
+=item Ivan Kohler
+
+Tested the first pre-release version and fixed a number of bugs.
+He also encouraged me to add better error reporting for system
+errors.  He also added failure_status support.
+
+=item Jason (Jayce^) Hall
+
+Adding Request Token Requirements (Among other significant improvements... )
+
+=back
 
 =head1 SEE ALSO
 
@@ -790,5 +806,6 @@ perl(1). L<Business::OnlinePayment>.
 
 =item Full support including Level III descriptors
 
-=cut
+=back
 
+=cut
