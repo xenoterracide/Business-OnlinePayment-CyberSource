@@ -328,6 +328,24 @@ sub get_AFS_codes {
   my $failure_status = $error_decoder->get_failure_status($error_code);
   my $error_action   = $error_decoder->get_action($error_code);
 
+=head1 API
+
+=over 4
+
+=item C<get_AFS_codes>
+
+=item C<get_AVS_Text>
+
+=item C<get_action>
+
+=item C<get_failure_status>
+
+=item C<get_text>
+
+=item C<new>
+
+=back
+
 =head1 SEE ALSO
 
 perl(1). L<Business::OnlinePayment>. L<Business::OnlinePayment::CyberSource>.

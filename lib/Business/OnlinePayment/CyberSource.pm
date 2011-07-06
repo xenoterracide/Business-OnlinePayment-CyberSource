@@ -666,18 +666,6 @@ loads C<cybs.ini>
 
 =item C<set_defaults>
 
-=item C<get_AFS_codes>
-
-=item C<get_AVS_Text>
-
-=item C<get_action>
-
-=item C<get_failure_status>
-
-=item C<get_text>
-
-=item C<new>
-
 =back
 
 =head1 SUPPORTED TRANSACTION TYPES
