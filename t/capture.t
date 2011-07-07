@@ -5,7 +5,7 @@ use Test::More;
 #testing/testing is valid and seems to work... (but not for auth + capture)
 use Business::OnlinePayment::CyberSource;
 
-my $tx = Business::OnlinePayment::Cybersource->new;
+my $tx = Business::OnlinePayment::CyberSource->new;
 $tx->content(
 	type           => 'VISA',
 	action         => 'Authorization Only',
