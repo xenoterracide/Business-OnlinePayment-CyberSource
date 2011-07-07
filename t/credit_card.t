@@ -1,4 +1,6 @@
 #!/usr/bin/perl
+use strict;
+use warnings;
 use Test::More;
 
 #testing/testing is valid and seems to work...
