@@ -40,6 +40,7 @@ $settle_tx->content(
 	amount         => '49.95',
 	invoice_number => '100100',
 	order_number   => $tx->order_number,
+	security_key   => $tx->security_key,
 );
 
 $settle_tx->test_transaction(1);    # test, dont really charge
