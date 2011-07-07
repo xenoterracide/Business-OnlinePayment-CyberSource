@@ -346,9 +346,10 @@ sub submit {
 		elsif (
 			$cybs_return_code == CyberSource::SOAPI::CYBS_S_PRE_SEND_ERROR )
 		{
-			$self->error_message(
-"Could not create the request - There is probably an error with your client configuration. More Information:"
-				  . $reply->{CyberSource::SOAPI::CYBS_SK_ERROR_INFO} );
+			$self->error_message( 'Could not create the request - '
+				. 'There is probably an error with your client configuration.'
+				. ' More Information: "'
+				. $reply->{CyberSource::SOAPI::CYBS_SK_ERROR_INFO} );
 		}
 		elsif (
 			$cybs_return_code == CyberSource::SOAPI::CYBS_S_PRE_SEND_ERROR )
