@@ -761,7 +761,7 @@ See the Cybersource documentation for the significance of these fields (type can
 
 =head1 COMPATIBILITY
 
-This module implements the Simple Order API 5.0 from Cybersource.
+This module implements the Simple Order API 1.x from Cybersource.
 
 =head1 THANK YOU
 
