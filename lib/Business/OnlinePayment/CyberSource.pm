@@ -362,12 +362,14 @@ sub submit {
 				. 'Your transaction may have been processed or it could have '
 				. 'blown up. '
 				. 'Check the business center to figure it out. '
-				. 'Good Luck... More Information: '
+				. 'Good Luck... More Information: "'
 				. $reply->{CyberSource::SOAPI::CYBS_SK_ERROR_INFO}
-				. ' Raw Error:'
+				. '" Raw Error: "'
 				. $reply->{CyberSource::SOAPI::CYBS_SK_RAW_REPLY}
-				. ' Probable Request ID:'
-				. $reply->{CyberSource::SOAPI::CYBS_SK_FAULT_REQUEST_ID} );
+				. '" Probable Request ID: "'
+				. $reply->{CyberSource::SOAPI::CYBS_SK_FAULT_REQUEST_ID}
+				. '"'
+			);
 		}
 		return 0;
 	}
