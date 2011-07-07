@@ -23,7 +23,7 @@ $tx->content(
 	country        => 'US',
 	email          => 'tofu@beast.org',
 	card_number    => '4111111111111111',
-	expiration     => '08/10',
+	expiration     => '12/25',
 );
 $tx->test_transaction(1);    # test, dont really charge
 $tx->submit();
