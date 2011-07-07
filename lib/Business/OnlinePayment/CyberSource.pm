@@ -10,7 +10,6 @@ use Business::OnlinePayment::CyberSource::Error;
 use CyberSource::SOAPI;
 
 use parent qw(Exporter Business::OnlinePayment);
-use AutoLoader;
 
 # ACTION MAP
 my @action_list = (
@@ -355,8 +354,10 @@ sub submit {
 			$cybs_return_code == CyberSource::SOAPI::CYBS_S_PRE_SEND_ERROR )
 		{
 			$self->error_message(
-				"Something bad happened while sending. More Information:"
-				  . $reply->{CyberSource::SOAPI::CYBS_SK_ERROR_INFO} );
+				'Something bad happened while sending. More Information: "'
+				. $reply->{CyberSource::SOAPI::CYBS_SK_ERROR_INFO}
+				. '"'
+			);
 		}
 		else {
 			$self->error_message( 'Something REALLY bad happened. '
