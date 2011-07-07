@@ -1,4 +1,5 @@
-BEGIN { $| = 2; print "1..2\n"; }
+#!/usr/bin/perl
+use Test::More;
 
 #testing/testing is valid and seems to work...
 
@@ -25,13 +26,8 @@ $tx->content(
 $tx->test_transaction('true');    # test, dont really charge
 $tx->submit();
 
-if ( $tx->is_success() ) {
-	print "ok 1\n";
-	if ( my $security_key = $tx->security_key ) {
-		print "ok 2\n";
-	}
-}
-else {
-	warn $tx->error_message;
-	print "not ok 1\n";
-}
+ok( $tx->is_success, 'transaction successful' );
+
+ok( $tx->security_key, 'check security key exists' )
+	or diag $tx->error_message;
+done_testing;
