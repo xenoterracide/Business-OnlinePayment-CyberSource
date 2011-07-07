@@ -3,9 +3,9 @@ use strict;
 use warnings;
 use Test::More;
 #testing/testing is valid and seems to work... (but not for auth + capture)
-use Business::OnlinePayment;
+use Business::OnlinePayment::CyberSource;
 
-my $tx = new Business::OnlinePayment("CyberSource");
+my $tx = Business::OnlinePayment::Cybersource->new;
 $tx->content(
 	type           => 'VISA',
 	action         => 'Authorization Only',

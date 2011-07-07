@@ -5,7 +5,7 @@ use Test::More;
 
 #testing/testing is valid and seems to work...
 
-use Business::OnlinePayment;
+use Business::OnlinePayment::CyberSource;
 
 my $tx = Business::OnlinePayment::CyberSource->new;
 $tx->content(
