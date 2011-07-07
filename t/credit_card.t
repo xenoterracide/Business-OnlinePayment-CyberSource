@@ -5,9 +5,9 @@ use Test::More;
 
 #testing/testing is valid and seems to work...
 
-use Business::OnlinePayment::CyberSource;
+use Business::OnlinePayment;
 
-my $tx = Business::OnlinePayment::CyberSource->new;
+my $tx = Business::OnlinePayment->new('CyberSource');
 $tx->content(
 	type           => 'VISA',
 	action         => 'Normal Authorization',
