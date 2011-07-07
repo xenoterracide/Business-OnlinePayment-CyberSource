@@ -25,7 +25,7 @@ $tx->content(
 	card_number    => '4111111111111111',
 	expiration     => '08/10',
 );
-$tx->test_transaction('true');    # test, dont really charge
+$tx->test_transaction(1);    # test, dont really charge
 $tx->submit();
 
 ok( $tx->is_success, 'transaction successful' );
