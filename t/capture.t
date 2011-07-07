@@ -30,7 +30,7 @@ ok ( $tx->is_success, 'transaction is success' );
 
 note( $tx->order_number );
 
-my $settle_tx = Business::OnlinePayment("CyberSource")->new;
+my $settle_tx = Business::OnlinePayment::CyberSource->new;
 
 $settle_tx->content(
 	type           => 'VISA',
