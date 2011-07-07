@@ -7,7 +7,7 @@ use Test::More;
 
 use Business::OnlinePayment;
 
-my $tx = new Business::OnlinePayment("CyberSource");
+my $tx = Business::OnlinePayment::CyberSource->new;
 $tx->content(
 	type           => 'VISA',
 	action         => 'Normal Authorization',
