@@ -28,7 +28,8 @@ $tx->content(
 $tx->test_transaction(1);    # test, dont really charge
 $tx->submit();
 
-ok( $tx->is_success, 'transaction successful' );
+ok( $tx->is_success, 'transaction successful' )
+	or diag $tx->error_message;
 
 ok( $tx->security_key, 'check security key exists' )
 	or diag $tx->error_message;
