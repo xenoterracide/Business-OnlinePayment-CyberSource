@@ -26,7 +26,8 @@ $tx->content(
 $tx->test_transaction(1);    # test, dont really charge
 $tx->submit();
 
-ok ( $tx->is_success, 'transaction is success' );
+ok ( $tx->is_success, 'transaction is success' )
+	or diag ( $tx->error_message );
 
 note( $tx->order_number );
 
