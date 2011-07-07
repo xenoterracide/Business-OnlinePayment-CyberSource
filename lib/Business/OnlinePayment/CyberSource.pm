@@ -370,6 +370,8 @@ sub submit {
 				. $reply->{CyberSource::SOAPI::CYBS_SK_RAW_REPLY}
 				. '" Probable Request ID: "'
 				. $reply->{CyberSource::SOAPI::CYBS_SK_FAULT_REQUEST_ID}
+				. '" return code: "'
+				. $cybs_return_code
 				. '"'
 			);
 		}
