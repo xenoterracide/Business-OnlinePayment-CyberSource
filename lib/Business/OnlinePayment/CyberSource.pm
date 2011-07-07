@@ -359,10 +359,10 @@ sub submit {
 		}
 		else {
 			$self->error_message( 'Something REALLY bad happened. '
-				. 'Yourtransaction may have '
-				. 'been processed or it could have blown up.  Check the '
-				. 'business center to figure it out. Good Luck... More '
-				. 'Information: '
+				. 'Your transaction may have been processed or it could have '
+				. 'blown up. '
+				. 'Check the business center to figure it out. '
+				. 'Good Luck... More Information: '
 				. $reply->{CyberSource::SOAPI::CYBS_SK_ERROR_INFO}
 				. ' Raw Error:'
 				. $reply->{CyberSource::SOAPI::CYBS_SK_RAW_REPLY}
