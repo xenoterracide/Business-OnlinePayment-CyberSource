@@ -11,6 +11,7 @@ use CyberSource::SOAPI;
 
 use parent qw(Exporter Business::OnlinePayment);
 
+my $config = { };
 # ACTION MAP
 my @action_list = (
 	'ccAuthService_run',    'ccAuthReversalService_run',
@@ -65,7 +66,7 @@ sub load_config {
 
 	my %config = CyberSource::SOAPI::cybs_load_config($conf_file);
 
-	$self->{'_config'} = \%config;
+	return \%config;
 }
 
 sub map_fields {
@@ -90,10 +91,10 @@ sub get_fields {
 }
 
 sub submit {
-	my ($self) = @_;
+	my ( $self ) = @_;
 
-	$self->load_config;
-	my $config  = $self->{'_config'};
+	$self->{config} ||= $self->load_config;
+	my $config = $self->{config};
 	my $content = $self->{'_content'};
 
 	my $reply   = {};
