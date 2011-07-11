@@ -7,6 +7,10 @@ use Test::More;
 
 use Business::OnlinePayment;
 
+plan skip_all => 'You must have the default configuration file: '
+	.'/etc/cybs.ini configured'
+	unless -e '/etc/cybs.ini';
+
 my $tx = Business::OnlinePayment->new('CyberSource');
 $tx->content(
 	type           => 'VISA',
