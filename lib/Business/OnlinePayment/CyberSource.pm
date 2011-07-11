@@ -50,7 +50,7 @@ my %request_token = (
 sub set_defaults {
 	my $self = shift;
 
-	$self->build_subs(
+	return $self->build_subs(
 		qw( order_number avs_code  cvv2_response cavv_response
 		  auth_reply auth_reversal_reply capture_reply
 		  credit_reply afs_reply failure_status security_key request_token
