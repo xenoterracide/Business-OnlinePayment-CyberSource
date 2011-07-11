@@ -85,7 +85,7 @@ sub get_fields {
 
 	my %content = $self->content();
 	my %new     = ();
-	foreach ( grep defined $content{$_}, @fields ) {
+	foreach ( grep { defined $content{$_} } @fields ) {
 		$new{$_} = $content{$_};
 	}
 	return %new;
