@@ -4,11 +4,8 @@ use strict;
 use warnings;
 
 BEGIN {
-
 	# VERSION
 }
-use vars qw(@ISA @EXPORT @EXPORT_OK);
-
 use parent 'Exporter';
 use AutoLoader;
 
@@ -295,7 +292,7 @@ sub get_text {
 
 sub get_failure_status {
 	my ( $self, $error_code ) = @_;
-	no warnings 'uninitialized';
+	no warnings 'uninitialized'; ## no critic ( TestingAndDebugging::ProhibitNoWarnings )
 	return $error_codes->{$error_code}->{'Status'};
 }
 

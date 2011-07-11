@@ -91,7 +91,7 @@ sub get_fields {
 	return %new;
 }
 
-sub submit {
+sub submit { ## no critic ( Subroutines::ProhibitExcessComplexity )
 	my ( $self ) = @_;
 
 	$self->{config} ||= $self->load_config;
@@ -403,7 +403,7 @@ sub submit {
 	my $afsHash            = {};
 
 	foreach my $key ( keys %{$reply} ) {
-		if ( $key =~ /^ccAuthReply_(.*)/xms ) {
+		if ( $key =~ /^ccAuthReply_(.*)/xms ) { ## no critic ( ControlStructures::ProhibitCascadingIfElse )
 			$ccAuthHash->{$key} = $reply->{$key};
 		}
 		elsif ( $key =~ /^ccAuthReversalReply_(.*)/xms ) {
@@ -442,7 +442,7 @@ sub submit {
 	return $self->is_success;
 }
 
-sub _set_item_list {
+sub _set_item_list { ## no critic ( Subroutines::RequireFinalReturn Subroutines::ProhibitExcessComplexity )
 
 	# Big time side effects - The items are going to be loaded into the hash
 	my ( $self, $content, $request ) = @_;
@@ -521,7 +521,7 @@ sub _set_item_list {
 	}
 }
 
-sub request_merge {
+sub request_merge { ## no critic ( Subroutines::RequireFinalReturn )
 	my ( $self, $request, $merge ) = @_;
 	foreach my $key ( keys %{$merge} ) {
 		$request->{$key} = $merge->{$key};
