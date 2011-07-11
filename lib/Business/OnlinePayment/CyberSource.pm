@@ -216,7 +216,7 @@ sub submit {
 	if ( defined( $content->{'expiration'} ) ) {
 
 		# This works for MM/YYYY, MM/YY, MMYYYY, and MMYY
-		$content->{'expiration'} =~ /^(\d+)\D*\d*(\d{2})$/
+		$content->{'expiration'} =~ /^(\d+)\D*\d*(\d{2})$/xms
 		  or croak "unparsable expiration " . $content->{expiration};
 		$request->{'card_expirationMonth'} = $1;
 		$request->{'card_expirationYear'}  = $2;
@@ -228,7 +228,7 @@ sub submit {
 	if ( defined( $content->{'ssn'} )
 		&& $content->{'ssn'} ne '' )
 	{
-		$content->{'ssn'} =~ s/-//g;
+		$content->{'ssn'} =~ s/-//gxms;
 	}
 
 	$content->{'card_cardType'} =
@@ -403,19 +403,19 @@ sub submit {
 	my $afsHash            = {};
 
 	foreach my $key ( keys %{$reply} ) {
-		if ( $key =~ /^ccAuthReply_(.*)/ ) {
+		if ( $key =~ /^ccAuthReply_(.*)/xms ) {
 			$ccAuthHash->{$key} = $reply->{$key};
 		}
-		elsif ( $key =~ /^ccAuthReversalReply_(.*)/ ) {
+		elsif ( $key =~ /^ccAuthReversalReply_(.*)/xms ) {
 			$ccAuthReversalHash->{$key} = $reply->{$key};
 		}
-		elsif ( $key =~ /^ccCaptureReply_(.*)/ ) {
+		elsif ( $key =~ /^ccCaptureReply_(.*)/xms ) {
 			$ccCaptureHash->{$key} = $reply->{$key};
 		}
-		elsif ( $key =~ /^ccCreditReply_(.*)/ ) {
+		elsif ( $key =~ /^ccCreditReply_(.*)/xms ) {
 			$ccCreditHash->{$key} = $reply->{$key};
 		}
-		elsif ( $key =~ /^afsReply_(.*)/ ) {
+		elsif ( $key =~ /^afsReply_(.*)/xms ) {
 			$afsHash->{$key} = $reply->{$key};
 		}
 	}
