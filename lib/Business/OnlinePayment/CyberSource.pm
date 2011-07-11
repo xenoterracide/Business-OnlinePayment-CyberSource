@@ -77,7 +77,7 @@ sub map_fields {
 	foreach ( keys %map ) {
 		$content{ $map{$_} } = $content{$_};
 	}
-	$self->content(%content);
+	return $self->content(%content);
 }
 
 sub get_fields {
