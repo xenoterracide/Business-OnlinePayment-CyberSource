@@ -1,6 +1,7 @@
 package Business::OnlinePayment::CyberSource::Error;
 use 5.006;
 use strict;
+use warnings;
 
 BEGIN {
 
