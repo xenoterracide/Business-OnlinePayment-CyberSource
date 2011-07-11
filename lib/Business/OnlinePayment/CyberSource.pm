@@ -100,7 +100,7 @@ sub submit {
 	my $reply   = {};
 	my $request = {};
 
-	my $error_handler = new Business::OnlinePayment::CyberSource::Error;
+	my $error_handler = Business::OnlinePayment::CyberSource::Error->new;
 
 	# If it's available but not set, grab the merchant_id from the conf
 	if ( !defined( $content->{'login'} )
