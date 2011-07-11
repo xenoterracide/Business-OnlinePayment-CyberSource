@@ -540,7 +540,7 @@ sub request_merge {
   # One step transaction, the simple case.
   ####
 
-  my $tx = new Business::OnlinePayment("CyberSource",
+  my $tx = Business::OnlinePayment->new("CyberSource",
                                        conf_file => '/path/to/cybs.ini'");
   $tx->content(
              type           => 'VISA',
@@ -590,7 +590,7 @@ sub request_merge {
   # process in one step as above.
   ####
 
-  my $tx = new Business::OnlinePayment("CyberSource",
+  my $tx = Business::OnlinePayment->new("CyberSource",
                                        conf_file => '/path/to/cybs.ini'");
   $tx->content(
              type           => 'VISA',
