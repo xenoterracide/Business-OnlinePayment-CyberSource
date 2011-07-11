@@ -94,8 +94,7 @@ sub get_fields {
 sub submit {
 	my ( $self ) = @_;
 
-	$self->{config} ||= $self->load_config;
-	my $config = $self->{config};
+	$config ||= $self->load_config;
 	my $content = $self->{'_content'};
 
 	my $reply   = {};
