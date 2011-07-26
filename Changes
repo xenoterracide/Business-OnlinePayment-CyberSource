@@ -1,4 +1,16 @@
-Revision history for Perl extension Business::OnlinePayment::CyberSource..
+Revision history for {{$dist->name}}
+
+{{$NEXT}}
+
+2.01      2011-07-25
+	- use dist-zilla
+	- mostly bring up to perl-critic compliance
+	- allow passing a config hash on object initialization
+	- fix to work with CyberSource Simple API 5.0
+	- new maintainership Caleb Cushing
+	
+2.00	2007-04-21
+	- release of 2.00, no changes noted, and I'm way to lazy to look at diff's
 
 0.09	2007-03-01
 	- Updated by Jason Hall (Jayce^) <jayce+cpan@lug-nut.com>
