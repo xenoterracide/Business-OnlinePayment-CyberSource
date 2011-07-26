@@ -8,7 +8,7 @@ Revision history for {{$dist->name}}
 	- allow passing a config hash on object initialization
 	- fix to work with CyberSource Simple API 5.0
 	- new maintainership Caleb Cushing
-	
+
 2.00	2007-04-21
 	- release of 2.00, no changes noted, and I'm way to lazy to look at diff's
 
