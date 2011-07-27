@@ -1,13 +1,13 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
-use Env qw( CYBS_ID CYBS_KEY );
+use Env qw( CYBS_ID CYBS_KEY_DIR );
 use Test::More;
 
 #testing/testing is valid and seems to work...
 
-plan skip_all => 'You MUST set ENV variable CYBS_ID and CYBS_KEY to test this!'
-		unless $CYBS_ID && $CYBS_KEY;
+plan skip_all => 'You MUST set ENV variable CYBS_ID and CYBS_KEY_DIR to test this!'
+		unless $CYBS_ID && $CYBS_KEY_DIR;
 
 use Business::OnlinePayment;
 
@@ -16,7 +16,7 @@ my $tx
 		'CyberSource',
 		config => {
 			merchantID       => $CYBS_ID,
-			keysDirectory    => $CYBS_KEY,
+			keysDirectory    => $CYBS_KEY_DIR,
 			targetAPIVersion => '1.60',
 			sendToProduction => 'false',
 		},
