@@ -82,7 +82,7 @@ before load_config => sub {
 
 sub load_config {
 	my $self = shift;
-	$self->_load_config;
+	return $self->_load_config;
 }
 
 sub map_fields {
