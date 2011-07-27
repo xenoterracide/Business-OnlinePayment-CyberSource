@@ -2,7 +2,9 @@ package Business::OnlinePayment::CyberSource;
 use 5.006;
 use strict;
 use warnings;
+
 BEGIN {
+
 	# VERSION
 }
 use Carp;
@@ -12,7 +14,8 @@ use CyberSource::SOAPI;
 
 use parent qw(Exporter Business::OnlinePayment);
 
-my $config = { };
+my $config = {};
+
 # ACTION MAP
 my @action_list = (
 	'ccAuthService_run',    'ccAuthReversalService_run',
@@ -23,8 +26,8 @@ my @action_list = (
 my %actions = (
 	'normal authorization' => [ 'ccAuthService_run', 'ccCaptureService_run' ],
 	'authorization only'   => ['ccAuthService_run'],
-	'credit'             => ['ccCreditService_run'],
-	'post authorization' => ['ccCaptureService_run'],
+	'credit'               => ['ccCreditService_run'],
+	'post authorization'   => ['ccCaptureService_run'],
 	'void authorization' => ['ccAuthReversalService_run'],
 );
 
@@ -52,9 +55,9 @@ sub set_defaults {
 
 	return $self->build_subs(
 		qw( order_number avs_code  cvv2_response cavv_response
-		  auth_reply auth_reversal_reply capture_reply
-		  credit_reply afs_reply failure_status security_key request_token
-		  )
+			auth_reply auth_reversal_reply capture_reply
+			credit_reply afs_reply failure_status security_key request_token
+			)
 	);
 }
 
@@ -63,7 +66,7 @@ sub load_config {
 
 	# The default is /etc/
 	my $conf_file = ( $self->can('conf_file') && $self->conf_file )
-	  || '/etc/cybs.ini';
+		|| '/etc/cybs.ini';
 
 	my %config = CyberSource::SOAPI::cybs_load_config($conf_file);
 
@@ -91,8 +94,8 @@ sub get_fields {
 	return %new;
 }
 
-sub submit { ## no critic ( Subroutines::ProhibitExcessComplexity )
-	my ( $self ) = @_;
+sub submit {    ## no critic ( Subroutines::ProhibitExcessComplexity )
+	my ($self) = @_;
 
 	$self->{config} ||= $self->load_config;
 	my $content = $self->{'_content'};
@@ -143,9 +146,9 @@ sub submit { ## no critic ( Subroutines::ProhibitExcessComplexity )
 
 	my %request_base = $self->get_fields(
 		@action_list, qw( afsService_run
-		  merchantID merchantReferenceCode
-		  clientApplication clientApplicationVersion clientApplicationUser
-		  )
+			merchantID merchantReferenceCode
+			clientApplication clientApplicationVersion clientApplicationUser
+			)
 	);
 
 	$self->request_merge( $request, \%request_base );
@@ -198,16 +201,16 @@ sub submit { ## no critic ( Subroutines::ProhibitExcessComplexity )
 
 	my %request = $self->get_fields(
 		qw( purchaseTotals_currency
-		  billTo_company billTo_firstName billTo_lastName billTo_street1
-		  billTo_street2 billTo_city billTo_state billTo_postalCode billTo_country
-		  billTo_ssn billTo_phoneNumber billTo_email card_accountNumber
-		  card_cvIndicator card_cvNumber shipTo_lastName shipTo_firstName
-		  shipTo_street1 shipTo_street2 shipTo_city shipTo_state shipTo_postalCode
-		  shiptTo_country shipTo_email shipTo_phoneNumber billTo_hostname
-		  billTo_httpBrowserType billTo_ipAddress ccAuthService_avsLevel
-		  merchant_descriptor AMEX_Data1 AMEX_Data2 AMEX_Data3 AMEX_Data4
-		  businessRules_scoreThreshold
-		  )
+			billTo_company billTo_firstName billTo_lastName billTo_street1
+			billTo_street2 billTo_city billTo_state billTo_postalCode billTo_country
+			billTo_ssn billTo_phoneNumber billTo_email card_accountNumber
+			card_cvIndicator card_cvNumber shipTo_lastName shipTo_firstName
+			shipTo_street1 shipTo_street2 shipTo_city shipTo_state shipTo_postalCode
+			shiptTo_country shipTo_email shipTo_phoneNumber billTo_hostname
+			billTo_httpBrowserType billTo_ipAddress ccAuthService_avsLevel
+			merchant_descriptor AMEX_Data1 AMEX_Data2 AMEX_Data3 AMEX_Data4
+			businessRules_scoreThreshold
+			)
 	);
 
 	$self->request_merge( $request, \%request );
@@ -217,7 +220,7 @@ sub submit { ## no critic ( Subroutines::ProhibitExcessComplexity )
 
 		# This works for MM/YYYY, MM/YY, MMYYYY, and MMYY
 		$content->{'expiration'} =~ /^(\d+)\D*\d*(\d{2})$/xms
-		  or croak "unparsable expiration " . $content->{expiration};
+			or croak "unparsable expiration " . $content->{expiration};
 		$request->{'card_expirationMonth'} = $1;
 		$request->{'card_expirationYear'}  = $2;
 	}
@@ -231,8 +234,7 @@ sub submit { ## no critic ( Subroutines::ProhibitExcessComplexity )
 		$content->{'ssn'} =~ s/-//gxms;
 	}
 
-	$content->{'card_cardType'} =
-	  $card_types{ lc( $self->transaction_type ) };
+	$content->{'card_cardType'} = $card_types{ lc( $self->transaction_type ) };
 
 	# Check and convert the data for an Authorization
 	if ( lc( $content->{'ccAuthService_run'} ) eq 'true' ) {
@@ -246,20 +248,20 @@ sub submit { ## no critic ( Subroutines::ProhibitExcessComplexity )
 	if ( lc( $content->{'ccAuthReversalService_run'} ) eq 'true' ) {
 		$self->required_fields(qw(request_id));
 		$request->{'ccAuthReversalService_authRequestID'} =
-		  $content->{'request_id'};
+			$content->{'request_id'};
 	}
 	if ( lc( $content->{'ccCaptureService_run'} ) eq 'true' ) {
 
 		if ( lc( $content->{'ccAuthService_run'} ) ne 'true' ) {
 			$self->required_fields(qw(order_number));
 			$request->{'ccCaptureService_authRequestID'} =
-			  $content->{'request_id'};
+				$content->{'request_id'};
 			$self->required_fields(qw(security_key));
 			$request->{ $request_token{'ccCaptureService_run'} } =
-			  $content->{'security_key'};
+				$content->{'security_key'};
 			if ( defined( $content->{'auth_code'} ) ) {
 				$request->{'ccCaptureService_authverbalAuthCode'} =
-				  $content->{'auth_code'};
+					$content->{'auth_code'};
 				$request->{'ccCaptureService_authType'} = 'verbal';
 			}
 		}
@@ -271,10 +273,10 @@ sub submit { ## no critic ( Subroutines::ProhibitExcessComplexity )
 		{
 			$self->required_fields(qw(request_id));
 			$request->{'ccCreditService_captureRequestID'} =
-			  $content->{'request_id'};
+				$content->{'request_id'};
 			$self->required_fields(qw(security_key));
 			$request->{ $request_token{'ccCreditService_run'} } =
-			  $content->{'security_key'};
+				$content->{'security_key'};
 		}
 		else {
 			$self->required_fields(
@@ -286,10 +288,8 @@ sub submit { ## no critic ( Subroutines::ProhibitExcessComplexity )
 		if (  !defined( $content->{'items'} )
 			|| scalar( $content->{'items'} ) < 1 )
 		{
-			croak(
-				'Advanced Fraud Screen requests require that you populate'
-				. ' the items hash.'
-			);
+			croak(    'Advanced Fraud Screen requests require that you populate'
+					. ' the items hash.' );
 		}
 	}
 
@@ -299,12 +299,13 @@ sub submit { ## no critic ( Subroutines::ProhibitExcessComplexity )
 	if (
 		$self->{config}->{'sendToProduction'}
 		&& ( lc( $self->{config}->{'sendToProduction'} ) eq 'true'
-		|| $self->{config}->{'sendToProduction'} eq '' )
-	) {
-		$self->{config}->{'sendToProduction'}
-			= $self->test_transaction() ? "false" : "true"
-			;
+			|| $self->{config}->{'sendToProduction'} eq '' )
+		)
+	{
+		$self->{config}->{'sendToProduction'} =
+			$self->test_transaction() ? "false" : "true";
 	}
+
 #
 # Use the configuration values for some of the business logic - However, let the request override these...
 #
@@ -312,69 +313,64 @@ sub submit { ## no critic ( Subroutines::ProhibitExcessComplexity )
 		&& defined( $self->{config}->{'businessRules_declineAVSFlags'} ) )
 	{
 		$request->{'businessRules_declineAVSFlags'} =
-		  $self->{config}->{'businessRules_declineAVSFlags'};
+			$self->{config}->{'businessRules_declineAVSFlags'};
 	}
 	if (  !defined( $request->{'businessRules_ignoreAVSResult'} )
 		&& defined( $self->{config}->{'businessRules_ignoreAVSResult'} ) )
 	{
 		$request->{'businessRules_ignoreAVSResult'} =
-		  $self->{config}->{'businessRules_ignoreAVSResult'};
+			$self->{config}->{'businessRules_ignoreAVSResult'};
 	}
 	if (  !defined( $request->{'businessRules_ignoreCVResult'} )
 		&& defined( $self->{config}->{'businessRules_ignoreCVResult'} ) )
 	{
 		$request->{'businessRules_ignoreCVResult'} =
-		  $self->{config}->{'businessRules_ignoreCVResult'};
+			$self->{config}->{'businessRules_ignoreCVResult'};
 	}
 
 #####
 ###Heres the Magic
 #####
 	my $cybs_return_code =
-	  CyberSource::SOAPI::cybs_run_transaction( $self->{config}, $request, $reply );
+		CyberSource::SOAPI::cybs_run_transaction( $self->{config}, $request,
+		$reply );
 
 	if ( $cybs_return_code != CyberSource::SOAPI::CYBS_S_OK ) {
 		$self->is_success(0);
-		if (
-			$cybs_return_code == CyberSource::SOAPI::CYBS_S_PERL_PARAM_ERROR )
+		if ( $cybs_return_code == CyberSource::SOAPI::CYBS_S_PERL_PARAM_ERROR )
 		{
-			$self->error_message(
-				'A parsing error occurred '
-				. '- there is a problem with one or more of the parameters.'
+			$self->error_message( 'A parsing error occurred '
+					. '- there is a problem with one or more of the parameters.'
 			);
 		}
-		elsif (
-			$cybs_return_code == CyberSource::SOAPI::CYBS_S_PRE_SEND_ERROR )
+		elsif ( $cybs_return_code == CyberSource::SOAPI::CYBS_S_PRE_SEND_ERROR )
 		{
 			$self->error_message( 'Could not create the request - '
-				. 'There is probably an error with your client configuration.'
-				. ' More Information: "'
-				. $reply->{CyberSource::SOAPI::CYBS_SK_ERROR_INFO} );
+					. 'There is probably an error with your client configuration.'
+					. ' More Information: "'
+					. $reply->{CyberSource::SOAPI::CYBS_SK_ERROR_INFO} );
 		}
-		elsif (
-			$cybs_return_code == CyberSource::SOAPI::CYBS_S_PRE_SEND_ERROR )
+		elsif ( $cybs_return_code == CyberSource::SOAPI::CYBS_S_PRE_SEND_ERROR )
 		{
 			$self->error_message(
 				'Something bad happened while sending. More Information: "'
-				. $reply->{CyberSource::SOAPI::CYBS_SK_ERROR_INFO}
-				. '"'
-			);
+					. $reply->{CyberSource::SOAPI::CYBS_SK_ERROR_INFO}
+					. '"' );
 		}
 		else {
 			$self->error_message( 'Something REALLY bad happened. '
-				. 'Your transaction may have been processed or it could have '
-				. 'blown up. '
-				. 'Check the business center to figure it out. '
-				. 'Good Luck... More Information: "'
-				. $reply->{CyberSource::SOAPI::CYBS_SK_ERROR_INFO}
-				. '" Raw Error: "'
-				. $reply->{CyberSource::SOAPI::CYBS_SK_RAW_REPLY}
-				. '" Probable Request ID: "'
-				. $reply->{CyberSource::SOAPI::CYBS_SK_FAULT_REQUEST_ID}
-				. '" return code: "'
-				. $cybs_return_code
-				. '"'
-			);
+					. 'Your transaction may have been processed or it could have '
+					. 'blown up. '
+					. 'Check the business center to figure it out. '
+					. 'Good Luck... More Information: "'
+					. $reply->{CyberSource::SOAPI::CYBS_SK_ERROR_INFO}
+					. '" Raw Error: "'
+					. $reply->{CyberSource::SOAPI::CYBS_SK_RAW_REPLY}
+					. '" Probable Request ID: "'
+					. $reply->{CyberSource::SOAPI::CYBS_SK_FAULT_REQUEST_ID}
+					. '" return code: "'
+					. $cybs_return_code
+					. '"' );
 		}
 		return 0;
 	}
@@ -390,8 +386,7 @@ sub submit { ## no critic ( Subroutines::ProhibitExcessComplexity )
 	}
 	else {
 		$self->is_success(0);
-		$self->error_message(
-			$error_handler->get_text( $self->result_code ) );
+		$self->error_message( $error_handler->get_text( $self->result_code ) );
 		$self->failure_status(
 			$error_handler->get_failure_status( $self->result_code ) );
 	}
@@ -403,7 +398,8 @@ sub submit { ## no critic ( Subroutines::ProhibitExcessComplexity )
 	my $afsHash            = {};
 
 	foreach my $key ( keys %{$reply} ) {
-		if ( $key =~ /^ccAuthReply_(.*)/xms ) { ## no critic ( ControlStructures::ProhibitCascadingIfElse )
+		if ( $key =~ /^ccAuthReply_(.*)/xms )
+		{    ## no critic ( ControlStructures::ProhibitCascadingIfElse )
 			$ccAuthHash->{$key} = $reply->{$key};
 		}
 		elsif ( $key =~ /^ccAuthReversalReply_(.*)/xms ) {
@@ -442,41 +438,40 @@ sub submit { ## no critic ( Subroutines::ProhibitExcessComplexity )
 	return $self->is_success;
 }
 
-sub _set_item_list { ## no critic ( Subroutines::RequireFinalReturn Subroutines::ProhibitExcessComplexity )
+sub _set_item_list
+{ ## no critic ( Subroutines::RequireFinalReturn Subroutines::ProhibitExcessComplexity )
 
 	# Big time side effects - The items are going to be loaded into the hash
 	my ( $self, $content, $request ) = @_;
 
 	# Here go the items/amounts
-	if ( defined( $content->{'items'} ) && scalar( $content->{'items'} ) > 0 )
-	{
+	if ( defined( $content->{'items'} ) && scalar( $content->{'items'} ) > 0 ) {
 		foreach my $item ( @{ $content->{'items'} } ) {
 			if ( defined( $item->{'type'} ) && $item->{'type'} ne '' ) {
 				$request->{ "item_" . $item->{'number'} . "_productCode" } =
-				  $item->{'type'};
+					$item->{'type'};
 			}
 			if ( defined( $item->{'SKU'} ) && $item->{'SKU'} ne '' ) {
 				$request->{ "item_" . $item->{'number'} . "_productSKU" } =
-				  $item->{'SKU'};
+					$item->{'SKU'};
 			}
 			if ( defined( $item->{'name'} ) && $item->{'name'} ne '' ) {
 				$request->{ "item_" . $item->{'number'} . "_productName" } =
-				  $item->{'name'};
+					$item->{'name'};
 			}
-			if ( defined( $item->{'quantity'} ) && $item->{'quantity'} ne '' )
-			{
+			if ( defined( $item->{'quantity'} ) && $item->{'quantity'} ne '' ) {
 				$request->{ "item_" . $item->{'number'} . "_quantity" } =
-				  $item->{'quantity'};
+					$item->{'quantity'};
 			}
 			if ( defined( $item->{'tax'} ) && $item->{'tax'} ne '' ) {
 				$request->{ "item_" . $item->{'number'} . "_taxAmount" } =
-				  $item->{'tax'};
+					$item->{'tax'};
 			}
 			if ( defined( $item->{'unit_price'} )
 				&& $item->{'unit_price'} ne '' )
 			{
 				$request->{ "item_" . $item->{'number'} . "_unitPrice" } =
-				  $item->{'unit_price'};
+					$item->{'unit_price'};
 			}
 			else {
 				croak( "Item " . $item->{'number'} . " has no unit_price" );
@@ -484,10 +479,8 @@ sub _set_item_list { ## no critic ( Subroutines::RequireFinalReturn Subroutines:
 		}
 	}
 	if ( defined( $content->{'amount'} ) && $content->{'amount'} ne '' ) {
-		if ( defined( $content->{'freight'} ) && $content->{'freight'} ne '' )
-		{
-			$request->{'purchaseTotals_freightAmount'} =
-			  $content->{'freight'};
+		if ( defined( $content->{'freight'} ) && $content->{'freight'} ne '' ) {
+			$request->{'purchaseTotals_freightAmount'} = $content->{'freight'};
 		}
 		if ( defined( $content->{'tax'} ) && $content->{'tax'} ne '' ) {
 			$request->{'purchaseTotals_taxAmount'} = $content->{'tax'};
@@ -496,11 +489,10 @@ sub _set_item_list { ## no critic ( Subroutines::RequireFinalReturn Subroutines:
 	}
 	if (
 		(
-			  !defined( $content->{'items'} )
-			|| scalar( $content->{'items'} ) < 0
+			!defined( $content->{'items'} ) || scalar( $content->{'items'} ) < 0
 		)
 		&& ( !defined( $content->{'amount'} ) || $content->{'amount'} eq '' )
-	  )
+		)
 	{
 		croak("It's impossible to auth without items or amount populated!");
 	}
@@ -521,7 +513,7 @@ sub _set_item_list { ## no critic ( Subroutines::RequireFinalReturn Subroutines:
 	}
 }
 
-sub request_merge { ## no critic ( Subroutines::RequireFinalReturn )
+sub request_merge {    ## no critic ( Subroutines::RequireFinalReturn )
 	my ( $self, $request, $merge ) = @_;
 	foreach my $key ( keys %{$merge} ) {
 		$request->{$key} = $merge->{$key};
