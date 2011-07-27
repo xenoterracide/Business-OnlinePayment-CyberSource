@@ -9,6 +9,9 @@ use Test::More;
 plan skip_all => 'You MUST set ENV variable CYBS_ID and CYBS_KEY_DIR to test this!'
 		unless $CYBS_ID && $CYBS_KEY_DIR;
 
+plan skip_all => 'CYBS_KEY_DIR: "' . $CYBS_KEY_DIR . '" does not exist'
+	unless -d $CYBS_KEY_DIR;
+
 use Business::OnlinePayment;
 
 my $tx
