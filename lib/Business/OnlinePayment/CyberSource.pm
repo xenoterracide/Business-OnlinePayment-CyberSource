@@ -2,16 +2,18 @@ package Business::OnlinePayment::CyberSource;
 use 5.006;
 use strict;
 use warnings;
-
+use Carp;
+our @CARP_NOT = qw(Class::Method::Modifiers Business::OnlinePayment);
 BEGIN {
 	# VERSION
 }
-use Carp;
 use Business::OnlinePayment;
 use Business::OnlinePayment::CyberSource::Error;
 use CyberSource::SOAPI;
 
-use parent qw(Exporter Business::OnlinePayment);
+use parent 'Business::OnlinePayment';
+
+use Class::Method::Modifiers;
 
 my $config = {};
 
@@ -60,7 +62,7 @@ sub set_defaults {
 	);
 }
 
-sub load_config {
+sub _load_config {
 	my $self = shift;
 
 	# The default is /etc/
@@ -70,6 +72,17 @@ sub load_config {
 	my %config = CyberSource::SOAPI::cybs_load_config($conf_file);
 
 	return \%config;
+}
+
+before load_config => sub {
+	carp 'DEPRECATED: do not call load_config directly, it will be removed '
+		. 'as a public method in the next version'
+		;
+};
+
+sub load_config {
+	my $self = shift;
+	$self->_load_config;
 }
 
 sub map_fields {
@@ -96,7 +109,7 @@ sub get_fields {
 sub submit {    ## no critic ( Subroutines::ProhibitExcessComplexity )
 	my ($self) = @_;
 
-	$self->{config} ||= $self->load_config;
+	$self->{config} ||= $self->_load_config;
 	my $content = $self->{'_content'};
 
 	my $reply   = {};
