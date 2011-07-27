@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 BEGIN {
-
 	# VERSION
 }
 use parent 'Exporter';
