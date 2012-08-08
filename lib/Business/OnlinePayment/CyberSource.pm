@@ -1,19 +1,17 @@
 package Business::OnlinePayment::CyberSource;
-use 5.006;
+
+use 5.010;
 use strict;
 use warnings;
-use Carp;
-our @CARP_NOT = qw(Class::Method::Modifiers Business::OnlinePayment);
-BEGIN {
-	# VERSION
-}
-use Business::OnlinePayment;
-use Business::OnlinePayment::CyberSource::Error;
-use CyberSource::SOAPI;
+use utf8::all;
 
 use parent 'Business::OnlinePayment';
 
-use Class::Method::Modifiers;
+use Moose;
+use MooseX::Types::Moose qw(HashRef);
+
+# ABSTRACT:  CyberSource backend for Business::OnlinePayment
+# VERSION
 
 my $config = {};
 
@@ -22,26 +20,6 @@ my @action_list = (
 	'ccAuthService_run',    'ccAuthReversalService_run',
 	'ccCaptureService_run', 'ccCreditService_run',
 	'afsService_run'
-);
-
-my %actions = (
-	'normal authorization' => [ 'ccAuthService_run', 'ccCaptureService_run' ],
-	'authorization only'   => ['ccAuthService_run'],
-	'credit'               => ['ccCreditService_run'],
-	'post authorization'   => ['ccCaptureService_run'],
-	'void authorization' => ['ccAuthReversalService_run'],
-);
-
-# CARD TYPE MAP
-my %card_types = (
-	'visa'             => '001',
-	'mastercard'       => '002',
-	'american express' => '003',
-	'discover'         => '004',
-	'diners club'      => '005',
-	'carte blanche'    => '006',
-	'jcb'              => '007',
-	'optima'           => '008',
 );
 
 # Requires Request Token List
@@ -532,9 +510,73 @@ sub request_merge {    ## no critic ( Subroutines::RequireFinalReturn )
 	}
 }
 
+#### Subroutine Definitions ####
+
+# Builds a credit card type mapping
+# Accepts:  Nothing
+# Returns:  A reference to a hash of credit card type mappings
+
+sub _build_cc_type_map {
+	my ( undef ) = @_;
+
+	my $map      = {
+		'visa'              => '001',
+		'mastercard'        => '002',
+		'american express'  => '003',
+		'discover'          => '004',
+		'diners club'       => '005',
+		'carte blanche'     => '006',
+		'jcb'               => '007',
+		'optima'            => '008',
+	};
+
+	return $map;
+}
+
+# Builds a action mapping
+# Accepts:  Nothing
+# Returns:  A reference to a hash of action mappings
+
+sub _build_action_map  {
+	my ( undef ) = @_;
+
+	my $map      = {
+		'normal authorization' => [ 'ccAuthService_run', 'ccCaptureService_run' ],
+		'authorization only'   => ['ccAuthService_run'],
+		'post authorization'   => ['ccCaptureService_run'],
+		'credit'               => ['ccCreditService_run'],
+		'void authorization' => ['ccAuthReversalService_run'],
+		'recurring authorization' => [],
+		'modify recurring authorization' => [],
+		'cancel recurring authorization' => [],
+	};
+
+	return $map;
+}
+
+#### Object Attributes ####
+
+has cc_type_map => (
+	isa       => HashRef,
+	is        => 'ro',
+	builder   => '_build_cc_type_map',
+	required  => 0,
+	init_arg  => undef,
+	lazy      => 1,
+);
+
+has action_map  => (
+	isa       => HashRef,
+	is        => 'ro',
+	builder   => '_build_action_map',
+	required  => 0,
+	init_arg  => undef,
+	lazy      => 1,
+);
+
 1;
 
-# ABSTRACT: CyberSource backend for Business::OnlinePayment
+=pod
 
 =head1 SYNOPSIS
 
