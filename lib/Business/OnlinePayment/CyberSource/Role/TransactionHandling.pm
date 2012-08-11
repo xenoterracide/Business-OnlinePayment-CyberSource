@@ -4,8 +4,11 @@ use 5.010;
 use strict;
 use warnings;
 use utf8::all;
+use namespace::autoclean;
 
 use Moose::Role;
+use MooseX::StrictConstructor;
+use Try::Tiny;
 
 # ABSTRACT:  Transaction handling role for BOP::CyberSource
 # VERSION
@@ -13,12 +16,63 @@ use Moose::Role;
 #### Subroutine Definitions ####
 
 # Submits the transaction request to CyberSource
-# Accepts:
-# Returns:
+# Accepts:  Nothing
+# Returns:  Nothing
 
 sub submit             {
-	my ($self) = @_;
+	my ( $self )             = @_;
+	my $content              = $self->content();
 
+	# Default values
+	my $data                 = {
+		reference_code => $self->_generate_transaction_id()
+	};
+
+	$content->{currency}     = 'USD' unless $content->{currency};
+
+	# purchaser information
+	$data->{bill_to}         = {
+		ip                     => $content->{customer_ip},
+		first_name             => $content->{first_name},
+		last_name              => $content->{last_name},
+		email                  => $content->{email},
+		phone_number           => $content->{phone},
+		street1                => $content->{address},
+		city                   => $content->{city},
+		state                  => $content->{state},
+		postal_code            => $content->{zip},
+		country                => $content->{country},
+	};
+
+	# Purchase totals information
+	$data->{purchase_totals} = {
+		total                  => $content->{amount},
+		currency               => $content->{currency},
+	};
+
+	given ( $content->{type} ) {
+		  when ( /^CC$/x ) {
+			#Credit Card information
+			$content->{expiration}     = ''
+				unless $content->{expiration} && $content->{expiration} =~ /^\d{4}-\d{2}-\d{2}\b/x;
+
+			my ( $year, $month, $day ) = split /-/x, $content->{expiration};
+
+			$data->{card}            = {
+				account_number         => $content->{card_number},
+				expiration             => { year => $year, month => $month },
+				security_code          => $content->{cvv2},
+			};
+		}
+		default {
+			Exception::Base->throw("$_ is an invalid action type");
+		}
+	}
+
+	my $request              = $self->_build_request( $data );
+	my $response             = $self->client->run_transaction( $request );
+
+=ignore
 	$self->{config} ||= $self->_load_config;
 	my $content = $self->{'_content'};
 
@@ -358,7 +412,52 @@ sub submit             {
 		$self->afs_reply($afsHash);
 	}
 	return $self->is_success;
+=cut
+
+	return;
 }
+
+# builds the Business::CyberSource client
+# Accepts:  Nothing
+# Returns:  A reference to a Business::CyberSource::Client object
+
+sub _build_client {
+	my ( $self )             = @_;
+	my $username             = $self->login();
+	my $password             = $self->password();
+	my $test                 = $self->test_mode();
+
+	my $data                 = {
+		username               => $username,
+		password               => $password,
+		production             => ! $test,
+	};
+
+	my $client               = Business::CyberSource::Client->new( $data );
+
+	return $client;
+}
+
+#### Object Attributes ####
+
+has _client => (
+	isa       => 'Business::CyberSource::Client',
+	is        => 'ro',
+	builder   => '_build_client',
+	required  => 0,
+	init_arg  => undef,
+	reader    => 'client',
+	lazy      => 1,
+);
+
+#### Method Modifiers ####
+
+before client => sub {
+	my ( $self ) = @_;
+
+	Exception::Base->throw( 'client is not a publically accessible method' )
+		unless ( ref $self eq __PACKAGE__ && ( caller )[0] eq __PACKAGE__ );
+};
 
 1;
 
@@ -375,8 +474,12 @@ sub submit             {
 
 my $thing = Thing->new();
 
+$thing->submit();
+
 =head1 DESCRIPTION
 
 This role provides consumers with methods for sending transaction requests to CyberSource and handling responses to those requests.
+
+=method submit
 
 =cut

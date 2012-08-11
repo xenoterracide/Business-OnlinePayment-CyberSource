@@ -4,8 +4,12 @@ use 5.010;
 use strict;
 use warnings;
 use utf8::all;
+use namespace::autoclean;
 
+use Config::Any;
+use File::HomeDir;
 use Moose::Role;
+use MooseX::StrictConstructor;
 use MooseX::Types::Moose qw(HashRef);
 
 # ABSTRACT:  Configuration role for BOP::CyberSource
@@ -13,38 +17,35 @@ use MooseX::Types::Moose qw(HashRef);
 
 #### Subroutine Definitions ####
 
-sub set_defaults {
-	my $self = shift;
-
-	return $self->build_subs(
-		qw( order_number avs_code  cvv2_response cavv_response
-			auth_reply auth_reversal_reply capture_reply
-			credit_reply afs_reply failure_status security_key request_token
-			)
-	);
-}
+# Loads module configuration from file
+# Accepts:  Nothing
+# Returns:  A reference to a hash of configuration data
 
 sub _load_config {
-	my $self = shift;
+	my ( undef )  = @_;
+	my $dir       = File::HomeDir::my_home();
+	my $file      = 'cybs';
+	my $config    = Config::Any->load_stems( { stems => [ "/etc/$file", "$dir/$file" ], flatten_to_hash => 1, use_ext => 1  } );
 
-	# The default is /etc/
-	my $conf_file = ( $self->can('conf_file') && $self->conf_file )
-		|| '/etc/cybs.ini';
+	if ( scalar keys $config > 0 ) {
+		my ( $key ) = keys $config;
 
-	my %config = CyberSource::SOAPI::cybs_load_config($conf_file);
+		$config     = $config->{ $key };
+	}
 
-	return \%config;
+	return $config;
 }
 
 before load_config => sub {
-	carp 'DEPRECATED: do not call load_config directly, it will be removed '
+	warn 'DEPRECATED: do not call load_config directly, it will be removed '
 		. 'as a public method in the next version'
 		;
 };
 
 sub load_config {
-	my $self = shift;
-	return $self->_load_config;
+	my ( $self ) = @_;
+
+	return $self->_load_config();
 }
 
 #### Object Attributes ####
@@ -52,7 +53,7 @@ sub load_config {
 has config => (
 	isa       => HashRef,
 	is        => 'ro',
-	default   => sub { {} },
+	builder   => '_load_config',
 	required  => 1,
 	predicate => 'has_config',
 	lazy      => 1,

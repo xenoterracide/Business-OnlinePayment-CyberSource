@@ -1,18 +1,30 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
+
+use 5.010;
 use strict;
 use warnings;
+use utf8::all;
+
+use File::HomeDir;
 use Test::More;
 
-#testing/testing is valid and seems to work...
+BEGIN {
+	my $dir         = File::HomeDir::my_home();
+	my $file        = 'cybs.ini';
 
-use Business::OnlinePayment;
+	plan skip_all => "You must have the configuration file: $file"
+		. " in either /etc or $dir to run this test"
+		unless -f "/etc/$file" || -f "$dir/$file";
+}
 
-plan skip_all => 'You must have the default configuration file: '
-	.'/etc/cybs.ini configured'
-	unless -e '/etc/cybs.ini';
+my $class         = 'Business::OnlinePayment';
+my $engine        = 'CyberSource';
 
-my $tx = Business::OnlinePayment->new('CyberSource');
-$tx->content(
+use_ok "${class}::$engine";
+
+my $tx = new_ok $class, [ $engine ];
+
+my $data = {
 	type           => 'VISA',
 	action         => 'Normal Authorization',
 	description    => 'Business::OnlinePayment visa test',
@@ -28,7 +40,9 @@ $tx->content(
 	email          => 'tofu@beast.org',
 	card_number    => '4111111111111111',
 	expiration     => '12/25',
-);
+};
+
+$tx->content( $data );
 $tx->test_transaction(1);    # test, dont really charge
 $tx->submit();
 
@@ -37,4 +51,5 @@ ok( $tx->is_success, 'transaction successful' )
 
 ok( $tx->security_key, 'check security key exists' )
 	or diag $tx->error_message;
+
 done_testing;

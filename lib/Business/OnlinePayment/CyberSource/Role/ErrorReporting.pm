@@ -4,8 +4,10 @@ use 5.010;
 use strict;
 use warnings;
 use utf8::all;
+use namespace::autoclean;
 
 use Moose::Role;
+use MooseX::StrictConstructor;
 use MooseX::Types::Moose qw(ArrayRef HashRef);
 use MooseX::Types::Common::String qw(NonEmptySimpleStr);
 

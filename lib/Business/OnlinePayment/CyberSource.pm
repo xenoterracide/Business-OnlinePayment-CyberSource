@@ -4,125 +4,16 @@ use 5.010;
 use strict;
 use warnings;
 use utf8::all;
+use namespace::autoclean;
 
 use parent qw(Business::OnlinePayment);
 
 use Moose;
+use MooseX::StrictConstructor;
 use MooseX::Types::Moose qw(HashRef Str);
 
 # ABSTRACT:  CyberSource backend for Business::OnlinePayment
 # VERSION
-
-#### Applied Roles ####
-
-with
-	'Business::OnlinePayment::CyberSource::Role::ErrorReporting';
-	'Business::OnlinePayment::CyberSource::Role::Configuration',
-	'Business::OnlinePayment::CyberSource::Role::TransactionHandling'
-;
-
-sub map_fields {
-	my ( $self, %map ) = @_;
-
-	my %content = $self->content();
-	foreach ( keys %map ) {
-		$content{ $map{$_} } = $content{$_};
-	}
-	return $self->content(%content);
-}
-
-sub get_fields {
-	my ( $self, @fields ) = @_;
-
-	my %content = $self->content();
-	my %new     = ();
-	foreach ( grep { defined $content{$_} } @fields ) {
-		$new{$_} = $content{$_};
-	}
-	return %new;
-}
-
-sub _set_item_list
-{ ## no critic ( Subroutines::RequireFinalReturn Subroutines::ProhibitExcessComplexity )
-
-	# Big time side effects - The items are going to be loaded into the hash
-	my ( $self, $content, $request ) = @_;
-
-	# Here go the items/amounts
-	if ( defined( $content->{'items'} ) && scalar( $content->{'items'} ) > 0 ) {
-		foreach my $item ( @{ $content->{'items'} } ) {
-			if ( defined( $item->{'type'} ) && $item->{'type'} ne '' ) {
-				$request->{ "item_" . $item->{'number'} . "_productCode" } =
-					$item->{'type'};
-			}
-			if ( defined( $item->{'SKU'} ) && $item->{'SKU'} ne '' ) {
-				$request->{ "item_" . $item->{'number'} . "_productSKU" } =
-					$item->{'SKU'};
-			}
-			if ( defined( $item->{'name'} ) && $item->{'name'} ne '' ) {
-				$request->{ "item_" . $item->{'number'} . "_productName" } =
-					$item->{'name'};
-			}
-			if ( defined( $item->{'quantity'} ) && $item->{'quantity'} ne '' ) {
-				$request->{ "item_" . $item->{'number'} . "_quantity" } =
-					$item->{'quantity'};
-			}
-			if ( defined( $item->{'tax'} ) && $item->{'tax'} ne '' ) {
-				$request->{ "item_" . $item->{'number'} . "_taxAmount" } =
-					$item->{'tax'};
-			}
-			if ( defined( $item->{'unit_price'} )
-				&& $item->{'unit_price'} ne '' )
-			{
-				$request->{ "item_" . $item->{'number'} . "_unitPrice" } =
-					$item->{'unit_price'};
-			}
-			else {
-				croak( "Item " . $item->{'number'} . " has no unit_price" );
-			}
-		}
-	}
-	if ( defined( $content->{'amount'} ) && $content->{'amount'} ne '' ) {
-		if ( defined( $content->{'freight'} ) && $content->{'freight'} ne '' ) {
-			$request->{'purchaseTotals_freightAmount'} = $content->{'freight'};
-		}
-		if ( defined( $content->{'tax'} ) && $content->{'tax'} ne '' ) {
-			$request->{'purchaseTotals_taxAmount'} = $content->{'tax'};
-		}
-		$request->{'purchaseTotals_grandTotalAmount'} = $content->{'amount'};
-	}
-	if (
-		(
-			!defined( $content->{'items'} ) || scalar( $content->{'items'} ) < 0
-		)
-		&& ( !defined( $content->{'amount'} ) || $content->{'amount'} eq '' )
-		)
-	{
-		croak("It's impossible to auth without items or amount populated!");
-	}
-
-	if ( $content->{'recurring_billing'} ) {
-		$request->{'ccAuthService_commerceIndicator'} = 'recurring';
-	}
-	else {
-		$request->{'ccAuthService_commerceIndicator'} = 'internet';
-	}
-
-	# Set the Currency
-	if ( defined( $content->{'currency'} ) && $content->{'currency'} ne '' ) {
-		$request->{'purchaseTotals_currency'} = $content->{'currency'};
-	}
-	else {
-		$request->{'purchaseTotals_currency'} = 'USD';
-	}
-}
-
-sub request_merge {    ## no critic ( Subroutines::RequireFinalReturn )
-	my ( $self, $request, $merge ) = @_;
-	foreach my $key ( keys %{$merge} ) {
-		$request->{$key} = $merge->{$key};
-	}
-}
 
 #### Subroutine Definitions ####
 
@@ -190,6 +81,95 @@ sub _build_action_map  {
 	return $map;
 }
 
+# Builds a fields map
+# Accepts:  Nothing
+# Returns:  A reference to a hash of field mappings
+
+sub _build_field_map   {
+	my ( undef ) = @_;
+
+	my $map      = {
+		required => {
+			all    => {
+				login
+				password
+				type
+				action
+				amount
+			},
+			CC     => {
+card_number
+expiration
+cvv2
+card_token
+			},
+			ECHECK => {
+				account_number
+				routing_code
+				account_type
+				account_name
+				bank_name
+				bank_city
+				bank_state
+				check_type
+				customer_org
+				customer_ssn
+				license_num
+				license_dob
+			},
+			LEC    => {},
+		},
+		optional => {
+			all    => {
+				description
+				invoice_number
+				po_number
+				tax
+				freight
+				duty
+				tax_exempt
+				currency
+				interval
+				start
+				periods
+			},
+			contact => {
+				customer_id
+				name
+				first_name
+				last_name
+				company
+				address
+				city
+				state
+				zip
+				country
+				ship_first_name
+				ship_last_name
+				ship_company
+				ship_address
+				ship_city
+				ship_state
+				ship_zip
+				ship_country
+				phone
+				fax
+				email
+				customer_ip
+			},
+			CC     => {
+				track1
+				track2
+				recurring_billing
+			},
+			ECHECK => {},
+			LEC    => {},
+		},
+	};
+
+	return $map;
+}
+
 #### Object Attributes ####
 
 has cc_type_map => (
@@ -209,6 +189,16 @@ has action_map  => (
 	init_arg  => undef,
 	lazy      => 1,
 );
+
+#### Applied Roles ####
+
+with
+	'Business::OnlinePayment::CyberSource::Role::ErrorReporting',
+	'Business::OnlinePayment::CyberSource::Role::Configuration',
+	'Business::OnlinePayment::CyberSource::Role::TransactionHandling'
+;
+
+#### Method Modifiers ####
 
 1;
 
