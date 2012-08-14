@@ -10,6 +10,7 @@ use Data::Dump 'dump';
 use MooseX::Aliases;
 use Try::Tiny;
 use Business::CyberSource::Client;
+use MooseX::Types::CyberSource qw(AVSResult);
 use MooseX::Types::Moose qw(Bool HashRef Int Str);
 use Business::CyberSource::Request::Authorization;
 use MooseX::Types::Common::String qw(NonEmptySimpleStr);
@@ -47,17 +48,25 @@ sub authorize          {
 	}
 	catch {
 		$self->error_message( $_ );
+
+		return $success;
 	};
 
 	my $response        = $self->run_transaction( $request );
 
-	say dump $response;
+	if ( $response->is_success() ) {
+		my $res           = $response->trace->response();
 
-	if ( $response->is_accepted() ) {
-		$success = 1;
+		$success          = 1;
 
-		$self->is_success( 1 );
-	}
+		$self->is_success( $success );
+		$self->avs_code( $response->avs_code() );
+		$self->response_code( $res->code() );
+		$self->response_page( $res->content() );
+		$self->response_headers( { map { $_ => $res->headers->header( $_ ) } $res->headers->header_field_names() } );
+
+		$self->cvv2_code( $response->cv_code() ) if $response->has_cv_code();
+}
 
 	return $success;
 }
@@ -242,7 +251,7 @@ has result_code => (
 );
 
 has avs_code => (
-	isa       => Str,
+	isa       => AVSResult,
 	is        => 'rw',
 	default   => '',
 	required  => 0,
@@ -343,6 +352,14 @@ has path => (
 	lazy      => 1,
 );
 
+has reference_code => (
+	isa       => Str,
+	is        => 'rw',
+	default   => '',
+	required  => 0,
+	lazy      => 1,
+);
+
 #### Method Modifiers ####
 
 before qr/^(?:authorize|capture|credit)$/x, sub {
@@ -357,7 +374,7 @@ before qr/^(?:authorize|capture|credit)$/x, sub {
 
 with
 	'Business::OnlinePayment::CyberSource::Role::InputHandling',
-	'Business::OnlinePayment::CyberSource::Role::ErrorHandling';
+	'Business::OnlinePayment::CyberSource::Role::ErrorReporting';
 
 1;
 
