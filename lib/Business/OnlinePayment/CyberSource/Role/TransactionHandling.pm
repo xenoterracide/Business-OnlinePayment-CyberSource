@@ -51,6 +51,8 @@ sub submit             {
 		currency               => $content->{currency},
 	};
 
+	$self->transaction_type( $content->{type} );
+
 	given ( $content->{type} ) {
 		  when ( /^CC$/x ) {
 			#Credit Card information

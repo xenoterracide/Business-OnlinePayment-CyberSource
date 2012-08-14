@@ -52,21 +52,30 @@ sub authorize          {
 		return $success;
 	};
 
-	my $response        = $self->run_transaction( $request );
+	try {
+		my $response        = $self->run_transaction( $request );
 
-	if ( $response->is_success() ) {
-		my $res           = $response->trace->response();
+		if ( $response->is_success() ) {
+			my $res           = $response->trace->response();
 
-		$success          = 1;
+			$success          = 1;
 
-		$self->is_success( $success );
-		$self->avs_code( $response->avs_code() );
-		$self->response_code( $res->code() );
-		$self->response_page( $res->content() );
-		$self->response_headers( { map { $_ => $res->headers->header( $_ ) } $res->headers->header_field_names() } );
+			$self->is_success( $success );
+			$self->avs_code( $response->avs_code() );
+			$self->authorization( $self->auth_code() );
+			$self->order_number();
+			$self->response_code( $req->code() );
+			$self->response_page( $res->content() );
+			$self->response_headers( { map { $_ => $res->headers->header( $_ ) } $res->headers->header_field_names() } );
 
-		$self->cvv2_code( $response->cv_code() ) if $response->has_cv_code();
-}
+			$self->cvv2_code( $response->cv_code() ) if $response->has_cv_code();
+		}
+	}
+	catch {
+		$self->error_message( $_ );
+
+		return $success;
+	};
 
 	return $success;
 }
@@ -375,6 +384,10 @@ before qr/^(?:authorize|capture|credit)$/x, sub {
 with
 	'Business::OnlinePayment::CyberSource::Role::InputHandling',
 	'Business::OnlinePayment::CyberSource::Role::ErrorReporting';
+
+#### Meta class stuff ####
+
+__PACKAGE__->meta->make_immutable();
 
 1;
 

@@ -204,6 +204,10 @@ with
 
 #### Method Modifiers ####
 
+#### Meta class stuff ####
+
+__PACKAGE__->meta->make_immutable();
+
 1;
 
 =pod
