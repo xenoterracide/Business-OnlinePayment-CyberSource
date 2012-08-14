@@ -9,6 +9,7 @@ use namespace::autoclean;
 use Moose::Role;
 use MooseX::StrictConstructor;
 use Try::Tiny;
+use Business::OnlinePayment::CyberSource::Client;
 
 # ABSTRACT:  Transaction handling role for BOP::CyberSource
 # VERSION
@@ -65,22 +66,14 @@ sub submit             {
 			};
 		}
 		default {
-			Exception::Base->throw("$_ is an invalid action type");
+			Exception::Base->throw("$_ is an invalid payment type");
 		}
 	}
 
-	my $request              = $self->_build_request( $data );
+	my $request              = {}; # $self->_build_request( $data );
 	my $response             = $self->client->run_transaction( $request );
 
 =ignore
-	$self->{config} ||= $self->_load_config;
-	my $content = $self->{'_content'};
-
-	my $reply   = {};
-	my $request = {};
-
-	my $error_handler = Business::OnlinePayment::CyberSource::Error->new;
-
 	# If it's available but not set, grab the merchant_id from the conf
 	if ( !defined( $content->{'login'} )
 		|| $content->{'login'} eq '' )
@@ -425,7 +418,7 @@ sub _build_client {
 	my ( $self )             = @_;
 	my $username             = $self->login();
 	my $password             = $self->password();
-	my $test                 = $self->test_mode();
+	my $test                 = $self->test_transaction();
 
 	my $data                 = {
 		username               => $username,
@@ -438,26 +431,41 @@ sub _build_client {
 	return $client;
 }
 
+sub _build_request {
+	my ( undef ) = @_;
+	my $request  = Business::OnlinePayment::CyberSource::Request->new();
+
+	return $request;
+}
+
 #### Object Attributes ####
 
 has _client => (
-	isa       => 'Business::CyberSource::Client',
-	is        => 'ro',
+	isa       => 'Business::OnlinePayment::CyberSource::Client',
+	is        => 'bare',
 	builder   => '_build_client',
 	required  => 0,
+	handles    => qr/^(?:
+		is_\w+
+		|auth\w+
+		|order\w+
+		|card\w+
+		|fraud\w+
+		|\w*response\w*
+		|\w+code
+		|\w*transaction\w*
+		|require\w+
+		|server
+		|port
+		|path
+		|username
+		|password
+	)$/x,
 	init_arg  => undef,
-	reader    => 'client',
 	lazy      => 1,
 );
 
 #### Method Modifiers ####
-
-before client => sub {
-	my ( $self ) = @_;
-
-	Exception::Base->throw( 'client is not a publically accessible method' )
-		unless ( ref $self eq __PACKAGE__ && ( caller )[0] eq __PACKAGE__ );
-};
 
 1;
 

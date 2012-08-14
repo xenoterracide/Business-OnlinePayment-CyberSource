@@ -9,8 +9,10 @@ use namespace::autoclean;
 use parent qw(Business::OnlinePayment);
 
 use Moose;
+use Exception::Base;
 use MooseX::StrictConstructor;
-use MooseX::Types::Moose qw(HashRef Str);
+use MooseX::Types::Moose qw(Bool HashRef Int);
+use MooseX::Types::Common::String qw(NonEmptySimpleStr);
 
 # ABSTRACT:  CyberSource backend for Business::OnlinePayment
 # VERSION
@@ -90,20 +92,20 @@ sub _build_field_map   {
 
 	my $map      = {
 		required => {
-			all    => {
+			all    => [ qw(
 				login
 				password
 				type
 				action
 				amount
-			},
-			CC     => {
+			) ],
+			CC     => [ qw (
 card_number
 expiration
 cvv2
 card_token
-			},
-			ECHECK => {
+			) ],
+			ECHECK => [ qw(
 				account_number
 				routing_code
 				account_type
@@ -116,11 +118,11 @@ card_token
 				customer_ssn
 				license_num
 				license_dob
-			},
-			LEC    => {},
+			) ],
+			LEC    => [ qw() ],
 		},
 		optional => {
-			all    => {
+			all    => [ qw(
 				description
 				invoice_number
 				po_number
@@ -132,8 +134,8 @@ card_token
 				interval
 				start
 				periods
-			},
-			contact => {
+			) ],
+			contact => [ qw(
 				customer_id
 				name
 				first_name
@@ -156,14 +158,14 @@ card_token
 				fax
 				email
 				customer_ip
-			},
-			CC     => {
+			) ],
+			CC     => [ qw(
 				track1
 				track2
 				recurring_billing
-			},
-			ECHECK => {},
-			LEC    => {},
+			) ],
+			ECHECK => [ qw() ],
+			LEC    => [ qw() ],
 		},
 	};
 
@@ -172,6 +174,7 @@ card_token
 
 #### Object Attributes ####
 
+# Maps CC types to
 has cc_type_map => (
 	isa       => HashRef,
 	is        => 'ro',
@@ -181,6 +184,7 @@ has cc_type_map => (
 	lazy      => 1,
 );
 
+# Maps action values to
 has action_map  => (
 	isa       => HashRef,
 	is        => 'ro',
