@@ -6,10 +6,9 @@ use warnings;
 use utf8::all;
 use namespace::autoclean;
 
-use parent qw(Business::OnlinePayment);
-
 use Moose;
 use Exception::Base;
+use MooseX::NonMoose;
 use MooseX::StrictConstructor;
 use MooseX::Types::Moose qw(Bool HashRef Int);
 use MooseX::Types::Common::String qw(NonEmptySimpleStr);
@@ -17,50 +16,9 @@ use MooseX::Types::Common::String qw(NonEmptySimpleStr);
 # ABSTRACT:  CyberSource backend for Business::OnlinePayment
 # VERSION
 
+extends 'Business::OnlinePayment';
+
 #### Subroutine Definitions ####
-
-# Preconstruction hook
-# Accepts:  A hash or reference to a hash of construction parameters
-# Returns:  A reference to a hash of construction parameters
-
-sub BUILDARGS          {
-	my ( undef ) = @_;
-
-# ACTION MAP
-my @action_list = (
-	'ccAuthService_run',    'ccAuthReversalService_run',
-	'ccCaptureService_run', 'ccCreditService_run',
-	'afsService_run'
-);
-
-# Requires Request Token List
-my %request_token = (
-	ccCaptureService_run      => 'ccCaptureService_authRequestToken',
-	ccCreditService_run       => 'ccCreditService_captureRequestToken',
-	ccAuthReversalService_run => 'ccAuthReversalService_authRequestToken',
-);
-}
-
-# Builds a credit card type mapping
-# Accepts:  Nothing
-# Returns:  A reference to a hash of credit card type mappings
-
-sub _build_cc_type_map {
-	my ( undef ) = @_;
-
-	my $map      = {
-		'visa'              => '001',
-		'mastercard'        => '002',
-		'american express'  => '003',
-		'discover'          => '004',
-		'diners club'       => '005',
-		'carte blanche'     => '006',
-		'jcb'               => '007',
-		'optima'            => '008',
-	};
-
-	return $map;
-}
 
 # Builds a action mapping
 # Accepts:  Nothing
@@ -173,26 +131,6 @@ card_token
 }
 
 #### Object Attributes ####
-
-# Maps CC types to
-has cc_type_map => (
-	isa       => HashRef,
-	is        => 'ro',
-	builder   => '_build_cc_type_map',
-	required  => 0,
-	init_arg  => undef,
-	lazy      => 1,
-);
-
-# Maps action values to
-has action_map  => (
-	isa       => HashRef,
-	is        => 'ro',
-	builder   => '_build_action_map',
-	required  => 0,
-	init_arg  => undef,
-	lazy      => 1,
-);
 
 #### Applied Roles ####
 

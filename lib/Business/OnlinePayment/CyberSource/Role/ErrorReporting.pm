@@ -16,15 +16,6 @@ use MooseX::Types::Common::String qw(NonEmptySimpleStr);
 
 #### Subroutine Definitions ####
 
-sub has_errors    {
-	my ( $self ) = @_;
-	my $result   = 0;
-
-	$result      = 1 if ( scalar @{ $self->errors() } > 0 );
-
-	return $result;
-}
-
 sub error_message {
 	my ( $self ) = @_;
 	my $message  = join "------\n", @{ $self->errors() };
@@ -38,31 +29,6 @@ has errors          => (
 	isa       => ArrayRef,
 	is        => 'ro',
 	default   => sub { [] },
-	required  => 0,
-	init_arg  => undef,
-	lazy      => 1,
-);
-
-has response_status => (
-	isa       => NonEmptySimpleStr,
-	is        => 'rw',
-	required  => 0,
-	predicate => 'has_response_status',
-	reader    => 'failure_status',
-	init_arg  => undef,
-	lazy      => 0,
-);
-
-has status_map      => (
-	isa       => HashRef,
-	is        => 'ro',
-	default   => sub {
-		my ( undef ) = @_;
-		my $statuses = [ qw(expired nsf stolen pickup blacklisted declined) ];
-		my $map      = { map { $_ => 1 } @$statuses };
-
-		return $map;
-	},
 	required  => 0,
 	init_arg  => undef,
 	lazy      => 1,

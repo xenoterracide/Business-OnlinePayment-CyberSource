@@ -61,22 +61,6 @@ has config => (
 
 #### Method Modifiers ####
 
-around BUILDARGS => sub {
-	my ( $orig, $self, @args ) = @_;
-	my $data                   = {};
-
-	if ( scalar @args == 1 && ref $args[0] eq 'HASH' ) {
-		$data                    = shift @args;
-	}
-	elsif ( ( scalar @args % 2 ) == 0 ) {
-		$data                    = { @args };
-	}
-
-	$data->{config}            = {};
-
-	return $self->$orig( $data );
-};
-
 1;
 
 =pod
