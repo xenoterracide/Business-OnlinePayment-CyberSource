@@ -7,6 +7,7 @@ use utf8::all;
 use namespace::autoclean;
 
 use Moose;
+use Data::Dump 'dump';
 use Exception::Base;
 use MooseX::NonMoose;
 use MooseX::StrictConstructor;
@@ -19,6 +20,19 @@ use MooseX::Types::Common::String qw(NonEmptySimpleStr);
 extends 'Business::OnlinePayment';
 
 #### Subroutine Definitions ####
+
+# Post-construction hook
+# Accepts:  A reference to a hash of construction parameters
+# Returns:  Nothing
+
+sub BUILD              {
+	my ( $self ) = @_;
+	my $fields   = [ qw(type action reference_code amount) ];
+
+	$self->required_fields( @$fields );
+
+	return;
+}
 
 # Builds a action mapping
 # Accepts:  Nothing

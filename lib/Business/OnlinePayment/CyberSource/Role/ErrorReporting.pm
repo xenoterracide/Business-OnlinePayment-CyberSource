@@ -8,7 +8,7 @@ use namespace::autoclean;
 
 use Moose::Role;
 use MooseX::StrictConstructor;
-use MooseX::Types::Moose qw(ArrayRef HashRef);
+use MooseX::Types::Moose qw(Str);
 use MooseX::Types::Common::String qw(NonEmptySimpleStr);
 
 # ABSTRACT:  Error reporting role for BOP::CyberSource
@@ -16,22 +16,18 @@ use MooseX::Types::Common::String qw(NonEmptySimpleStr);
 
 #### Subroutine Definitions ####
 
-sub error_message {
-	my ( $self ) = @_;
-	my $message  = join "------\n", @{ $self->errors() };
-
-	return $message;
-}
-
 #### Object Attributes ####
 
-has errors          => (
-	isa       => ArrayRef,
-	is        => 'ro',
-	default   => sub { [] },
+has error          => (
+	isa       => Str,
+	is        => 'rw',
 	required  => 0,
+	predicate => 'has_errors',
+	clearer   => 'clear_error',
+	reader    => 'error_message',
+	writer    => 'set_error_message',
 	init_arg  => undef,
-	lazy      => 1,
+	lazy      => 0,
 );
 
 1;

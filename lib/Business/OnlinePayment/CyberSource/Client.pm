@@ -47,7 +47,7 @@ sub authorize          {
 		Business::CyberSource::Request::Authorization->new( $data );
 	}
 	catch {
-		$self->error_message( $_ );
+		$self->set_error_message( shift );
 
 		return $success;
 	};
@@ -71,11 +71,15 @@ sub authorize          {
 			$self->cvv2_code( $response->cv_code() ) if $response->has_cv_code();
 		}
 		else {
-			$self->error_message( $response->reason_text() );
+			$self->set_error_message( $response->reason_text() );
+
+			say "Error: " . $response->reason_text();
 		}
 	}
 	catch {
-		$self->error_message( $_ );
+		$self->set_error_message( $_ );
+
+		say "Error: $_";
 	};
 
 	return $success;

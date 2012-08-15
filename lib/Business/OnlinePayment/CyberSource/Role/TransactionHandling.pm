@@ -6,6 +6,7 @@ use warnings;
 use utf8::all;
 use namespace::autoclean;
 
+use Data::Dump 'dump';
 use Moose::Role;
 use MooseX::StrictConstructor;
 use Try::Tiny;
@@ -32,18 +33,16 @@ sub submit             {
 	$content->{currency} ||= 'USD';
 
 	# purchaser information
-	$data->{bill_to}         = {
-		ip                     => $content->{customer_ip},
-		first_name             => $content->{first_name},
-		last_name              => $content->{last_name},
-		email                  => $content->{email},
-		phone_number           => $content->{phone},
-		street1                => $content->{address},
-		city                   => $content->{city},
-		state                  => $content->{state},
-		postal_code            => $content->{zip},
-		country                => $content->{country},
-	};
+	$data->{bill_to}->{ip} = $content->{customer_ip} if $content->{customer_ip};
+	$data->{bill_to}->{first_name} = $content->{first_name} if $content->{first_name};
+	$data->{bill_to}->{last_name} = $content->{last_name} if $content->{last_name};
+	$data->{bill_to}->{email} = $content->{email} if $content->{email};
+	$data->{bill_to}->{phone_number} = $content->{phone} if $content->{phone};
+	$data->{bill_to}->{street1} = $content->{address} if $content->{address};
+	$data->{bill_to}->{city} = $content->{city} if $content->{city};
+	$data->{bill_to}->{state} = $content->{state} if $content->{state};
+	$data->{bill_to}->{postal_code} = $content->{zip} if $content->{zip};
+	$data->{bill_to}->{country} = $content->{country} if $content->{country};
 
 	# Purchase totals information
 	$data->{purchase_totals} = {
@@ -56,21 +55,37 @@ sub submit             {
 	given ( $content->{type} ) {
 		  when ( /^CC$/x ) {
 			#Credit Card information
+			my $year                 = 0;
+			my $month                = 0;
+			my $day                  = 0;
+
 			$content->{expiration}     = ''
-				unless $content->{expiration} && $content->{expiration} =~ /^\d{4}-\d{2}-\d{2}\b/x;
+				unless $content->{expiration};
 
-			my ( $year, $month, $day ) = split /-/x, $content->{expiration};
+			if ( $content->{expiration} =~ /^\d{4}-\d{2}-\d{2}\b/x ) {
+				( $year, $month, $day ) = split /-/x, $content->{expiration};
+			}
+			elsif ( $content->{expiration} =~ /^\d{2}\/\d{2,4}$/x ) {
+				( $month, $year )       = split /\//, $content->{expiration};
+			}
 
-			$data->{card}            = {
-				account_number         => $content->{card_number},
-				expiration             => { year => $year, month => $month },
-				security_code          => $content->{cvv2},
-			};
+			$year += 2000 if ( $year < 100 && $year > 0 );
+
+			$data->{card}->{account_number} = $content->{card_number};
+
+			$data->{card}->{expiration} = { year => $year, month => $month }
+				if ( $month && $year );
+
+			# $data->{card}->{security_code} = $content->{cvv2} if $content->{cvv2};
+			$data->{card}->{security_code} = undef;
 		}
 		default {
 			Exception::Base->throw("$_ is an invalid payment type");
 		}
 	}
+
+	$self->username( $content->{login} );
+	$self->password( $content->{password} );
 
 	my $result                   = 0;
 
