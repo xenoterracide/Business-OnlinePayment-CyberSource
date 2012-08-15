@@ -3,6 +3,7 @@
 use 5.010;
 use strict;
 use warnings;
+use utf8::all;
 
 use Test::More;
 
@@ -51,7 +52,7 @@ $client->test_transaction(1);    # test, dont really charge
 my $success       = $client->submit();
 
 ok $client->is_success(), 'transaction successful'
-	or note $client->error_message();
+	or diag $client->error_message();
 
 is   $client->is_success(), $success, 'Success matches';
 like $client->authorization(), qr/^\w+$/, 'Authorization is a string';
@@ -61,7 +62,7 @@ ok   ! defined( $client->fraud_score() ), 'Fraud score is not defined';
 ok   ! defined( $client->fraud_transaction_id() ), 'Fraud transaction id is not defined';
 is   $client->response_code(), 200, 'Response code is 200';
 is   ref( $client->response_headers() ), 'HASH', 'Response headers is a hashref';
-like $client->response_page(), qr/^\w+$/, 'Response page is a string';
+like $client->response_page(), qr/^.+$/sm, 'Response page is a string';
 like $client->result_code(), qr/^\w+$/, 'Result code is a string';
 like $client->avs_code(), qr/^\w+$/, 'AVS code is a string';
 like $client->cvv2_response(), qr/^\w+$/, 'CVV2 code is a string';
@@ -70,7 +71,7 @@ is   $client->login(), $ENV{BOPC_UN}, 'Login matches';
 is   $client->password(), $ENV{BOPC_PW}, 'Password matches';
 is   $client->test_transaction(), 1, 'Test transaction matches';
 is   $client->require_avs(), 0, 'Require AVS matches';
-is   $client->server(), 'ics2wstest.ics3.com', 'Server matches';
+is   $client->server(), 'ics2wstest.ic3.com', 'Server matches';
 is   $client->port(), 443, 'Port matches';
 is   $client->path(), 'commerce/1.x/transactionProcessor', 'Path matches';
 is   $client->reference_code(), $data->{reference_code}, 'Reference code matches';
