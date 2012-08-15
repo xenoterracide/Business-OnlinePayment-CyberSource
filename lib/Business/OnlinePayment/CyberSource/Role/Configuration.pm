@@ -3,7 +3,6 @@ package Business::OnlinePayment::CyberSource::Role::Configuration;
 use 5.010;
 use strict;
 use warnings;
-use utf8::all;
 use namespace::autoclean;
 
 use Config::Any;
