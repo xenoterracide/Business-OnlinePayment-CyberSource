@@ -62,19 +62,20 @@ sub authorize          {
 
 			$self->is_success( $success );
 			$self->avs_code( $response->avs_code() );
-			$self->authorization( $self->auth_code() );
-			$self->order_number();
-			$self->response_code( $req->code() );
+			$self->authorization( $response->auth_record() );
+			$self->order_number( $response->request_id() );
+			$self->response_code( $res->code() );
 			$self->response_page( $res->content() );
 			$self->response_headers( { map { $_ => $res->headers->header( $_ ) } $res->headers->header_field_names() } );
 
 			$self->cvv2_code( $response->cv_code() ) if $response->has_cv_code();
 		}
+		else {
+			$self->error_message( $response->reason_text() );
+		}
 	}
 	catch {
 		$self->error_message( $_ );
-
-		return $success;
 	};
 
 	return $success;
@@ -160,140 +161,154 @@ sub _build_client {
 #### Object Attributes ####
 
 has is_success => (
-	isa       => Str,
+	isa       => Bool,
 	is        => 'rw',
-	default   => '',
+	default   => 0,
 	required  => 0,
 	clearer   => 'clear_success',
 	init_arg  => undef,
 	lazy      => 1,
 );
 
+# Authorization code
 has authorization => (
 	isa       => Str,
 	is        => 'rw',
-	default   => '',
 	required  => 0,
+	predicate => 'has_authorization',
 	clearer   => 'clear_authorization',
 	init_arg  => undef,
-	lazy      => 1,
+	lazy      => 0,
 );
 
+# Number identifying the specific request
 has order_number => (
 	isa       => Str,
 	is        => 'rw',
-	default   => '',
 	required  => 0,
+	predicate => 'has_order_number',
 	clearer   => 'clear_order_number',
 	init_arg  => undef,
-	lazy      => 1,
+	lazy      => 0,
 );
 
+# Used in stead of card number (not yet supported)
 has card_token => (
 	isa       => Str,
 	is        => 'rw',
-	default   => '',
 	required  => 0,
+	predicate => 'has_card_token',
 	clearer   => 'clear_card_token',
 	init_arg  => undef,
-	lazy      => 1,
+	lazy      => 0,
 );
 
+# score assigned by ... (not yet supported)
 has fraud_score => (
 	isa       => Str,
 	is        => 'rw',
-	default   => '',
 	required  => 0,
+	predicate => 'has_fraud_score',
 	clearer   => 'clear_fraud_score',
 	init_arg  => undef,
-	lazy      => 1,
+	lazy      => 0,
 );
 
+# Transaction id assigned by ... (not yet supported)
 has fraud_transaction_id => (
 	isa       => Str,
 	is        => 'rw',
-	default   => '',
 	required  => 0,
+	predicate => 'has_fraud_transaction_id',
 	clearer   => 'clear_fraud_transaction_id',
 	init_arg  => undef,
-	lazy      => 1,
+	lazy      => 0,
 );
 
+# HTTP response code
 has response_code => (
-	isa       => Str,
+	isa       => Int,
 	is        => 'rw',
-	default   => '',
 	required  => 0,
+	predicate => 'has_response_code',
 	clearer   => 'clear_response_code',
 	init_arg  => undef,
-	lazy      => 1,
+	lazy      => 0,
 );
 
+# HTTP response headers
 has response_headers => (
 	isa       => HashRef,
 	is        => 'rw',
-	default   => sub { {} },
 	required  => 0,
+	predicate => 'has_response_headers',
 	clearer   => 'clear_response_headers',
 	init_arg  => undef,
-	lazy      => 1,
+	lazy      => 0,
 );
 
+# HTTP response content
 has response_page => (
 	isa       => Str,
 	is        => 'rw',
-	default   => '',
 	required  => 0,
+	predicate => 'has_response_page',
 	clearer   => 'clear_response_page',
 	init_arg  => undef,
-	lazy      => 1,
+	lazy      => 0,
 );
 
+# ...
 has result_code => (
 	isa       => Str,
 	is        => 'rw',
-	default   => '',
 	required  => 0,
+	predicate => 'has_result_code',
 	clearer   => 'clear_result_code',
 	init_arg  => undef,
-	lazy      => 1,
+	lazy      => 0,
 );
 
+# address verification response code
 has avs_code => (
 	isa       => AVSResult,
 	is        => 'rw',
-	default   => '',
 	required  => 0,
+	predicate => 'has_avs_code',
 	clearer   => 'clear_avs_code',
 	init_arg  => undef,
-	lazy      => 1,
+	lazy      => 0,
 );
 
+# CVV2 response value
 has cvv2_response => (
 	isa       => Str,
 	is        => 'rw',
-	default   => '',
 	required  => 0,
+	predicate => 'has_cvv2_response',
 	clearer   => 'clear_cvv2_response',
 	init_arg  => undef,
-	lazy      => 1,
+	lazy      => 0,
 );
 
+# Type of payment
 has transaction_type => (
 	isa       => Str,
 	is        => 'rw',
-	default   => '',
 	required  => 0,
+	predicate => 'has_transaction_type',
 	clearer   => 'clear_transaction_type',
 	init_arg  => undef,
-	lazy      => 1,
+	lazy      => 0,
 );
 
+# Business::CyberSource client object
 has _client => (
 	isa       => 'Business::CyberSource::Client',
 	is        => 'bare',
 	builder   => '_build_client',
 	required  => 0,
+	predicate => 'has_client',
 	init_arg  => undef,
 	handles   => qr/^(?:run_transaction)$/x,
 	lazy      => 1,
@@ -304,6 +319,7 @@ has username => (
 	isa       => NonEmptySimpleStr,
 	is        => 'rw',
 	required  => 0,
+	predicate => 'has_login',
 	alias     => 'login',
 	lazy      => 0,
 );
@@ -313,6 +329,7 @@ has password => (
 	isa       => Str,
 	is        => 'rw',
 	required  => 0,
+	predicate => 'has_password',
 	lazy      => 0,
 );
 
@@ -322,6 +339,14 @@ has test_transaction => (
 	is        => 'rw',
 	default   => 0,
 	required  => 0,
+	predicate => 'has_test_transaction',
+	trigger   => sub {
+		my ( $self, $value ) = @_;
+
+		$self->clear_server() if $value;
+
+		return;
+	},
 	lazy      => 1,
 );
 
@@ -331,6 +356,7 @@ has require_avs => (
 	is        => 'rw',
 	default   => 0,
 	required  => 0,
+	predicate => 'has_require_avs',
 	lazy      => 1,
 );
 
@@ -338,8 +364,13 @@ has require_avs => (
 has server => (
 	isa       => NonEmptySimpleStr,
 	is        => 'rw',
-	builder   => '_build_server',
+	default   => sub {
+		my ( $self ) = @_;
+
+		return ( $self->test_transaction() ) ? 'ics2wstest.ic3.com' : 'ics2ws.ic3.com';
+	},
 	required  => 0,
+	predicate => 'has_server',
 	lazy      => 1,
 );
 
@@ -347,8 +378,9 @@ has server => (
 has port => (
 	isa       => Int,
 	is        => 'rw',
-	builder   => '_build_port',
+	default   => 443,
 	required  => 0,
+	predicate => 'has_port',
 	lazy      => 1,
 );
 
@@ -356,17 +388,21 @@ has port => (
 has path => (
 	isa       => NonEmptySimpleStr,
 	is        => 'rw',
-	builder   => '_build_path',
+	default   => 'commerce/1.x/transactionProcessor',
 	required  => 0,
+	predicate => 'has_path',
 	lazy      => 1,
 );
 
+# Murchant generated code to identify transaction
 has reference_code => (
 	isa       => Str,
 	is        => 'rw',
-	default   => '',
 	required  => 0,
-	lazy      => 1,
+	predicate => 'has_reference_code',
+	clearer   => 'clear_reference_code',
+	init_arg  => undef,
+	lazy      => 0,
 );
 
 #### Method Modifiers ####
@@ -377,6 +413,14 @@ before qr/^(?:authorize|capture|credit)$/x, sub {
 	$self->_clear_fields();
 
 	return;
+};
+
+around qr/^(?:server|port|path)$/x, sub {
+	my ( $orig, $self, @args ) = @_;
+
+	Exception::Base->throw( 'Setting server, port, and or path information is not supported by this module' ) if ( scalar @args > 0 );
+
+	return $self->$orig( @args );
 };
 
 #### Consumed Roles ####
