@@ -40,7 +40,12 @@ sub authorize          {
 	$message            = 'No payment medium specified to authorize'
 		unless $data->{card};
 
+	$message            = 'No reference code specified to authorize'
+		unless $data->{reference_code};
+
 	Exception::Base->throw( $message ) if $message;
+
+	$self->reference_code( $data->{reference_code} );
 
 	my $request         = try {
 		Business::CyberSource::Request::Authorization->new( $data );
@@ -48,7 +53,7 @@ sub authorize          {
 	catch {
 		my $message = shift;
 
-		$self->set_error_message( $message );
+		$self->set_error_message( "$message" );
 
 		return $success;
 	};
@@ -73,14 +78,12 @@ sub authorize          {
 		}
 		else {
 			$self->set_error_message( $response->reason_text() );
-
-			say "Error: " . $response->reason_text();
 		}
 	}
 	catch {
-		$self->set_error_message( $_ );
+		my $message = shift;
 
-		say "Error: $_";
+		$self->set_error_message( "$message" );
 	};
 
 	return $success;
