@@ -77,7 +77,6 @@ sub submit             {
 				if ( $month && $year );
 
 			$data->{card}->{security_code} = $content->{cvv2} if $content->{cvv2};
-			# $data->{card}->{security_code} = undef;
 		}
 		default {
 			Exception::Base->throw("$_ is an invalid payment type");
@@ -124,6 +123,8 @@ has _client => (
 		|username
 		|login
 		|password
+		| error_message
+		| failure_status
 	)$/x,
 	init_arg  => undef,
 	lazy      => 1,
