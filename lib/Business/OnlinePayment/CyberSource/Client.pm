@@ -46,10 +46,14 @@ sub authorize          {
 		Business::CyberSource::Request::Authorization->new( $data );
 	}
 	catch {
-		$self->set_error_message( shift );
+		my $message = shift;
+
+		$self->set_error_message( $message );
 
 		return $success;
 	};
+
+	say "Ref: " . ref $request;
 
 	try {
 		my $response        = $self->run_transaction( $request );

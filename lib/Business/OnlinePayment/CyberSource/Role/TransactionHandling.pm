@@ -75,8 +75,8 @@ sub submit             {
 			$data->{card}->{expiration} = { year => $year, month => $month }
 				if ( $month && $year );
 
-			# $data->{card}->{security_code} = $content->{cvv2} if $content->{cvv2};
-			$data->{card}->{security_code} = undef;
+			$data->{card}->{security_code} = $content->{cvv2} if $content->{cvv2};
+			# $data->{card}->{security_code} = undef;
 		}
 		default {
 			Exception::Base->throw("$_ is an invalid payment type");
