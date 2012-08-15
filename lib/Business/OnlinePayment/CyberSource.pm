@@ -148,7 +148,7 @@ card_token
 
 #### Applied Roles ####
 
-with	'Business::OnlinePayment::CyberSource::Role::TransactionHandling';
+with 'Business::OnlinePayment::CyberSource::Role::TransactionHandling';
 
 #### Method Modifiers ####
 
