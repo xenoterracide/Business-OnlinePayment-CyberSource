@@ -29,10 +29,10 @@ sub authorize          {
 	my $success         = 0;
 
 	# Validate input
-	my $message         = '';
+	my $message;
 
 	$message            = 'No request data specified to authorize'
-		unless scalar keys $data > 0;
+		if scalar keys $data == 0;
 
 	$message            = 'purchase_totals data must be specified to authorize as a hashref'
 		unless $data->{purchase_totals} && ref $data->{purchase_totals} eq 'HASH';
