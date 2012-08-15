@@ -371,6 +371,7 @@ has server => (
 	},
 	required  => 0,
 	predicate => 'has_server',
+	clearer   => 'clear_server',
 	lazy      => 1,
 );
 
