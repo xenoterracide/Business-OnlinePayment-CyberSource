@@ -3,7 +3,6 @@ package Business::OnlinePayment::CyberSource::Client;
 use 5.010;
 use strict;
 use warnings;
-use utf8::all;
 
 use Moose;
 use Data::Dump 'dump';
