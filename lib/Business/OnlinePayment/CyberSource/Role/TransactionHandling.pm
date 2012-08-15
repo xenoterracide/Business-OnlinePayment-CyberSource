@@ -22,11 +22,11 @@ use Business::OnlinePayment::CyberSource::Client;
 
 sub submit             {
 	my ( $self )             = @_;
-	my $content              = $self->content();
+	my $content              = { $self->content() };
 
 	# Default values
 	my $data                 = {
-		reference_code => $self->_generate_transaction_id()
+		reference_code => $content->{reference_code}
 	};
 
 	$content->{currency} ||= 'USD';
@@ -75,8 +75,8 @@ sub submit             {
 	my $result                   = 0;
 
 	given ( $content->{action} ) {
-		  when ( /^normal authorization$/xi ) {
-			$result = $self->authorize();
+		  when ( /^normal\sauthorization$/ix ) {
+			$result = $self->authorize( $data );
 		}
 		default {
 			Exception::Base->throw( "$_ is an invalid action" );
@@ -86,40 +86,12 @@ sub submit             {
 	return $result;
 }
 
-# builds the Business::CyberSource client
-# Accepts:  Nothing
-# Returns:  A reference to a Business::CyberSource::Client object
-
-sub _build_client {
-	my ( $self )             = @_;
-	my $username             = $self->login();
-	my $password             = $self->password();
-	my $test                 = $self->test_transaction();
-
-	my $data                 = {
-		username               => $username,
-		password               => $password,
-		production             => ! $test,
-	};
-
-	my $client               = Business::CyberSource::Client->new( $data );
-
-	return $client;
-}
-
-sub _build_request {
-	my ( undef ) = @_;
-	my $request  = Business::OnlinePayment::CyberSource::Request->new();
-
-	return $request;
-}
-
 #### Object Attributes ####
 
 has _client => (
 	isa       => 'Business::OnlinePayment::CyberSource::Client',
 	is        => 'bare',
-	builder   => '_build_client',
+	default   => sub { Business::OnlinePayment::CyberSource::Client->new() },
 	required  => 0,
 	handles    => qr/^(?:
 		is_\w+
@@ -135,6 +107,7 @@ has _client => (
 		|port
 		|path
 		|username
+		|login
 		|password
 	)$/x,
 	init_arg  => undef,
