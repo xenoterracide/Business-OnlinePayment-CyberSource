@@ -54,8 +54,6 @@ sub authorize          {
 		return $success;
 	};
 
-	say "Ref: " . ref $request;
-
 	try {
 		my $response        = $self->run_transaction( $request );
 
