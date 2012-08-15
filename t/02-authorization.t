@@ -46,14 +46,15 @@ my $data          = {
 	expiration      => '12/25',
 };
 
-$client->content( $data );
+$client->content( %$data );
 $client->test_transaction(1);    # test, dont really charge
 
 my $success       = $client->submit();
 
 ok $client->is_success(), 'transaction successful'
-	or diag $client->error_message();
+	or note $client->error_message();
 
+is   $client->is_success(), $success, 'Success matches';
 like $client->authorization(), qr/^\w+$/, 'Authorization is a string';
 like $client->order_number(), qr/^\w+$/, 'Order number is a string';
 ok   ! defined( $client->card_token() ), 'Card token is not defined';
