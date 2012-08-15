@@ -29,6 +29,16 @@ has error          => (
 	lazy      => 0,
 );
 
+has failure_status => (
+	isa       => Str,
+	is        => 'rw',
+	required  => 0,
+	predicate => 'has_failure_status',
+	clearer   => 'clear_failure_status',
+	init_arg  => undef,
+	lazy      => 0,
+);
+
 1;
 
 =pod

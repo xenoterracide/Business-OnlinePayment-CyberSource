@@ -147,11 +147,7 @@ card_token
 
 #### Applied Roles ####
 
-with
-	'Business::OnlinePayment::CyberSource::Role::ErrorReporting',
-	'Business::OnlinePayment::CyberSource::Role::Configuration',
-	'Business::OnlinePayment::CyberSource::Role::TransactionHandling'
-;
+with	'Business::OnlinePayment::CyberSource::Role::TransactionHandling';
 
 #### Method Modifiers ####
 
