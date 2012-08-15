@@ -24,7 +24,7 @@ extends 'Business::OnlinePayment';
 # Accepts:  A reference to a hash of construction parameters
 # Returns:  Nothing
 
-sub BUILD              {
+sub BUILD {
 	my ( $self ) = @_;
 	my $fields   = [ qw(type action reference_code amount) ];
 
@@ -37,7 +37,7 @@ sub BUILD              {
 # Accepts:  Nothing
 # Returns:  A reference to a hash of action mappings
 
-sub _build_action_map  {
+sub _build_action_map { ## no critic ( Subroutines::ProhibitUnusedPrivateSubroutines )
 	my ( undef ) = @_;
 
 	my $map      = {
@@ -58,7 +58,8 @@ sub _build_action_map  {
 # Accepts:  Nothing
 # Returns:  A reference to a hash of field mappings
 
-sub _build_field_map   {
+sub _build_field_map { ## no critic ( Subroutines::ProhibitUnusedPrivateSubroutines )
+
 	my ( undef ) = @_;
 
 	my $map      = {
