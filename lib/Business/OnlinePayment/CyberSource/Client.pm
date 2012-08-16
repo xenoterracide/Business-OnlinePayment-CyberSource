@@ -5,6 +5,7 @@ use strict;
 use warnings;
 
 use Moose;
+use Class::Load 0.20 qw(load_class);
 use Data::Dump 'dump';
 use MooseX::Aliases;
 use MooseX::StrictConstructor;
@@ -13,8 +14,6 @@ use Business::CyberSource::Client;
 use MooseX::Types::CyberSource qw(AVSResult);
 use MooseX::Types::Moose qw(Bool HashRef Int Str);
 use MooseX::Types::Common::String qw(NonEmptySimpleStr);
-
-use Class::Load 0.20 qw( load_class );
 
 # ABSTRACT:  CyberSource Client object  for Business::OnlinePayment::CyberSource
 # VERSION
@@ -137,12 +136,12 @@ sub capture            {
 	Exception::Base->throw( $message ) if $message;
 
 	my $request         = try {
-		Business::CyberSource::Request::Capture->new( $data );
+		load_class( 'Business::CyberSource::Request::Capture' )->new( $data );
 	}
 	catch {
 		$message       = shift;
 
-		$self->error_message( "$message" );
+		$self->set_error_message( "$message" );
 
 		return $success;
 	};
