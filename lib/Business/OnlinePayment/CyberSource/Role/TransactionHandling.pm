@@ -88,8 +88,11 @@ sub submit             {
 	my $result                   = 0;
 
 	given ( $content->{action} ) {
-		  when ( /^authorization\ only$/ix ) {
+		when ( /^authorization\ only$/ix ) {
 			$result = $self->authorize( $data );
+		}
+		when ( /^normal\ authorization$/ix ) {
+			$result = $self->sale( $data );
 		}
 		default {
 			Exception::Base->throw( "$_ is an invalid action" );
@@ -117,6 +120,7 @@ has _client => (
 		|\w*transaction\w*
 		|require\w+
 		|server
+		|sale
 		|port
 		|path
 		|username
