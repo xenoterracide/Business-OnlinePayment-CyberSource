@@ -311,33 +311,6 @@ loads C<cybs.ini>
 
 Content required: type, login, action, amount, first_name, last_name, card_number, expiration.
 
-=head2 Checks
-
-Currently not supported (TODO)
-
-=head1 NOTE
-
-=head2 cybs.ini
-
-The cybs.ini default home is /etc/cybs.ini - if you would prefer it to
-live someplace else specify that in the new.
-
-A few notes on cybs.ini - most settings can be overwritten by the submit
-call - except for the following exceptions:
-
-  sendToProduction
-
-From a systems perspective, this should be hard so that there is NO
-confusion as to which server the request goes against.
-
-You can set the business rules from the ini - the following rules are supported
-
-  businessRules_declineAVSFlags
-
-  businessRules_ignoreAVSResult
-
-  businessRules_ignoreCVResult
-
 =head2 Full Name vs. First & Last
 
 Unlike Business::OnlinePayment, Business::OnlinePayment::CyberSource
@@ -395,7 +368,7 @@ See the Cybersource documentation for the significance of these fields (type can
 
 This module implements the Simple Order API 1.x from Cybersource.
 
-=head1 THANK YOU
+=head1 ACKNOWLEDGMENTS
 
 =over 4
 
