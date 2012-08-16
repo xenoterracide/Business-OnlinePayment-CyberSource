@@ -26,7 +26,7 @@ sub submit             {
 
 	# Default values
 	my $data                 = {
-		reference_code => $content->{reference_code}
+		reference_code => $content->{invoice_number}
 	};
 
 	$content->{currency} ||= 'USD';
@@ -48,6 +48,9 @@ sub submit             {
 		total                  => $content->{amount},
 		currency               => $content->{currency},
 	};
+
+	# Other fields
+	$data->{comment} = $content->{description} if $content->{description};
 
 	$self->transaction_type( $content->{type} );
 
