@@ -62,10 +62,10 @@ sub submit             {
 				unless $content->{expiration};
 
 			if ( $content->{expiration} =~ /^\d{4}-\d{2}-\d{2}\b/x ) {
-				( $year, $month, $day ) = split /-/x, $content->{expiration};
+				( $year, $month, $day ) = split '-', $content->{expiration};
 			}
 			elsif ( $content->{expiration} =~ /^\d{2}\/\d{2,4}$/x ) {
-				( $month, $year )       = split /\//, $content->{expiration};
+				( $month, $year )       = split '/', $content->{expiration};
 			}
 
 			$year += 2000 if ( $year < 100 && $year > 0 );
