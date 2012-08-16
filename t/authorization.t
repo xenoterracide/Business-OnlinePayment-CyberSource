@@ -11,10 +11,9 @@ BEGIN {
 	$username = $ENV{PERL_BUSINESS_CYBERSOURCE_USERNAME};
 	$password = $ENV{PERL_BUSINESS_CYBERSOURCE_PASSWORD};
 
-	plan skip_all =>
-		'No credentials set in the environment.  Set BOPC_UN and BOPC_PW to run this test.'
-		unless ( $username && $password );
-}
+plan skip_all =>
+	'No credentials set in the environment.  Set BOPC_UN and PERL_BUSINESS_CYBERSOURCE_PASSWORD to run this test.'
+	unless ( $username && $password );
 
 my $class         = 'Business::OnlinePayment';
 my $engine        = 'CyberSource';
@@ -48,8 +47,6 @@ my $data          = {
 $client->content( %$data );
 $client->test_transaction(1);    # test, dont really charge
 
-$ENV{PERL_BUSINESS_CYBERSOURCE_DEBUG} = 1;
-
 my $success       = $client->submit();
 
 ok $client->is_success(), 'transaction successful'
@@ -68,8 +65,8 @@ like $client->result_code(), qr/^\w+$/, 'Result code is a string';
 like $client->avs_code(), qr/^\w+$/, 'AVS code is a string';
 like $client->cvv2_response(), qr/^\w+$/, 'CVV2 code is a string';
 is   $client->transaction_type(), $data->{type}, 'Type matches';
-is   $client->login(), $ENV{BOPC_UN}, 'Login matches';
-is   $client->password(), $ENV{BOPC_PW}, 'Password matches';
+is   $client->login(), $username, 'Login matches';
+is   $client->password(), $password, 'Password matches';
 is   $client->test_transaction(), 1, 'Test transaction matches';
 is   $client->require_avs(), 0, 'Require AVS matches';
 is   $client->server(), 'ics2wstest.ic3.com', 'Server matches';
