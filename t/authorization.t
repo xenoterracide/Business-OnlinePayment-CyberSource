@@ -14,6 +14,7 @@ BEGIN {
 plan skip_all =>
 	'No credentials set in the environment.  Set BOPC_UN and PERL_BUSINESS_CYBERSOURCE_PASSWORD to run this test.'
 	unless ( $username && $password );
+}
 
 my $class         = 'Business::OnlinePayment';
 my $engine        = 'CyberSource';
