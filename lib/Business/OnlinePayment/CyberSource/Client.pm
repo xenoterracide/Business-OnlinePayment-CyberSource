@@ -255,6 +255,7 @@ sub credit             {
 sub auth_reversal {
 	my ( $self, @args ) = @_;
 	my $data            = $self->_parse_input( @args );
+	my $success         = 0;
 
 	#Validate input
 	my $message;
@@ -270,6 +271,8 @@ sub auth_reversal {
 
 	Exception::Base->throw( $message ) if $message;
 
+	$self->invoice_number( $data );
+
 	my $request         = try {
 		load_class( 'Business::CyberSource::Request::AuthReversal' )->new( $data );
 	}
@@ -277,9 +280,35 @@ sub auth_reversal {
 		$self->set_error_message( "$_" );
 	};
 
-	my $response        = $self->run_transaction( $request );
+	try {
+		my $response        = $self->run_transaction( $request );
 
-	return $response->is_success;
+		if ( $response->is_success() ) {
+			my $res         = $response->trace->response();
+
+			$success        = 1;
+
+			$self->is_success ( $success );
+			$self->order_number( $response->request_id() );
+			$self->response_code( $res->code() );
+			$self->response_page( $res->content() );
+			$self->response_headers({
+					map { ## no critic ( BuiltinFunctions::ProhibitVoidMap )
+						$_ => $res->headers->header( $_ )
+					} $res->headers->header_field_names()
+				} );
+		}
+		else {
+			$self->set_error_message( $response->reason_text() );
+		}
+	}
+	catch {
+		$message       = shift;
+
+		$self->set_error_message( "$message" );
+	};
+
+	return $success;
 }
 
 # Resets all transaction fields
@@ -572,7 +601,7 @@ has invoice_number => (
 
 #### Method Modifiers ####
 
-before qr/^(?:authorize|capture|credit)$/x, sub {
+before qr/^(?:authorize|auth_reversal|capture|credit|sale)$/x, sub {
 	my ( $self ) = @_;
 
 	$self->_clear_fields();
