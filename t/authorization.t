@@ -11,8 +11,10 @@ BEGIN {
 	$username = $ENV{PERL_BUSINESS_CYBERSOURCE_USERNAME};
 	$password = $ENV{PERL_BUSINESS_CYBERSOURCE_PASSWORD};
 
-plan skip_all =>
-	'No credentials set in the environment.  Set BOPC_UN and PERL_BUSINESS_CYBERSOURCE_PASSWORD to run this test.'
+plan skip_all
+	=> 'No credentials set in the environment.'
+	. ' Set PERL_BUSINESS_CYBERSOURCE_USERNAME and '
+	. 'PERL_BUSINESS_CYBERSOURCE_PASSWORD to run this test.'
 	unless ( $username && $password );
 }
 
