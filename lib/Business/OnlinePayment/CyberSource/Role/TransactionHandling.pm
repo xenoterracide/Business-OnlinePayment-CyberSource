@@ -148,6 +148,7 @@ has _client => (
 		| error_message
 		| failure_status
 		| capture
+		|invoice_number
 	)$/x,
 	init_arg  => undef,
 	lazy      => 1,
