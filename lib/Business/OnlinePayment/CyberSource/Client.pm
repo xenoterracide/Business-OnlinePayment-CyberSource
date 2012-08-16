@@ -62,7 +62,7 @@ sub _authorize          {
 
 	Exception::Base->throw( $message ) if $message;
 
-	$self->reference_code( $data->{reference_code} );
+	$self->invoice_number( $data->{reference_code} );
 
 	my $request         = try {
 		load_class( $class )->new( $data );
@@ -74,6 +74,8 @@ sub _authorize          {
 
 		return $success;
 	};
+
+	return $request unless $request;
 
 	try {
 		my $response        = $self->run_transaction( $request );
@@ -145,6 +147,8 @@ sub capture            {
 
 		return $success;
 	};
+
+	return $request unless $request;
 
 	try {
 		my $response      = $self->run_transaction( $request );
@@ -473,12 +477,13 @@ has path => (
 );
 
 # Murchant generated code to identify transaction
-has reference_code => (
+has invoice_number => (
 	isa       => Str,
 	is        => 'rw',
 	required  => 0,
-	predicate => 'has_reference_code',
-	clearer   => 'clear_reference_code',
+	predicate => 'has_invoice_number',
+	clearer   => 'clear_invoice_number',
+	alias     => 'reference_code',
 	init_arg  => undef,
 	lazy      => 0,
 );
