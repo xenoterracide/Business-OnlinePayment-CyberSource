@@ -49,6 +49,14 @@ sub submit             {
 		currency               => $content->{currency},
 	};
 
+	$data->{service} = { request_id => $content->{po_number} }
+		if $content->{po_number};
+
+	$data->{reference_code}
+		=  $content->{invoice_number}
+		if $content->{invoice_number}
+		;
+
 	# Other fields
 	$data->{comments} = $content->{description} if $content->{description};
 
@@ -100,9 +108,10 @@ sub submit             {
 			$result = $self->sale( $data );
 		}
 		when ( /^post\ authorization$/ix ) {
-			$data->{service} = { request_id => $content->{request_id} };
-
 			$result = $self->capture( $data );
+		}
+		when ( /^void$/ix ) {
+			$result = $self->auth_reversal( $data );
 		}
 		default {
 			Exception::Base->throw( "$_ is an invalid action" );

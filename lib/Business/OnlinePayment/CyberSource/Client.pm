@@ -200,6 +200,40 @@ sub credit             {
 	return $success;
 }
 
+# Sends a AuthReversal request to CyberSource
+# Accepts: a hash or hashref of request parameters
+# Returns: 1 if success or 0
+
+sub auth_reversal {
+	my ( $self, @args ) = @_;
+	my $data            = $self->_parse_input( @args );
+
+	#Validate input
+	my $message;
+
+	$message = 'No reference code supplied to void'
+		unless $data->{reference_code};
+
+	$message = 'No service data supplied to void'
+		unless $data->{service};
+
+	$message = 'No purchase totals supplied to void'
+		unless $data->{purchase_totals};
+
+	Exception::Base->throw( $message ) if $message;
+
+	my $request         = try {
+		load_class( 'Business::CyberSource::Request::AuthReversal' )->new( $data );
+	}
+	catch {
+		$self->set_error_message( "$_" );
+	};
+
+	my $response        = $self->run_transaction( $request );
+
+	return $response->is_success;
+}
+
 # Resets all transaction fields
 # Accepts:  Nothing
 # Returns:  Nothing
