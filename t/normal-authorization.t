@@ -21,12 +21,11 @@ my $client = new_ok( load_class('Business::OnlinePayment'), [ 'CyberSource' ]);
 my $data          = {
 	login           => $username,
 	password        => $password,
-	reference_code  => 44544,
+	invoice_number  => 44544,
 	type            => 'CC',
 	action          => 'Normal Authorization',
 	description     => 'Business::OnlinePayment visa test',
 	amount          => '9000',
-	invoice_number  => '100100',
 	first_name      => 'Tofu',
 	last_name       => 'Beast',
 	address         => '123 Anystreet',
@@ -68,6 +67,6 @@ is   $client->require_avs(), 0, 'Require AVS matches';
 is   $client->server(), 'ics2wstest.ic3.com', 'Server matches';
 is   $client->port(), 443, 'Port matches';
 is   $client->path(), 'commerce/1.x/transactionProcessor', 'Path matches';
-is   $client->reference_code(), $data->{reference_code}, 'Reference code matches';
+is   $client->reference_code(), $data->{invoice_number}, 'Reference code matches';
 
 done_testing;
