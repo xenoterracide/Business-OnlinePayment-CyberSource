@@ -6,13 +6,12 @@ use warnings;
 
 use Test::More;
 
-my ( $username, $password );
-BEGIN {
-	$username = $ENV{PERL_BUSINESS_CYBERSOURCE_USERNAME};
-	$password = $ENV{PERL_BUSINESS_CYBERSOURCE_PASSWORD};
+my $username = $ENV{PERL_BUSINESS_CYBERSOURCE_USERNAME};
+my $password = $ENV{PERL_BUSINESS_CYBERSOURCE_PASSWORD};
 
 plan skip_all =>
-	'No credentials set in the environment.  Set BOPC_UN and PERL_BUSINESS_CYBERSOURCE_PASSWORD to run this test.'
+	'No credentials set in the environment.  Set PERL_BUSINESS_CYBERSOURCE_USERNAME'
+	. 'and PERL_BUSINESS_CYBERSOURCE_PASSWORD to run this test.'
 	unless ( $username && $password );
 
 my $class         = 'Business::OnlinePayment';
@@ -62,8 +61,8 @@ is   $client->response_code(), 200, 'Response code is 200';
 is   ref( $client->response_headers() ), 'HASH', 'Response headers is a hashref';
 like $client->response_page(), qr/^.+$/sm, 'Response page is a string';
 like $client->result_code(), qr/^\w+$/, 'Result code is a string';
-like $client->avs_code(), qr/^\w+$/, 'AVS code is a string';
-like $client->cvv2_response(), qr/^\w+$/, 'CVV2 code is a string';
+is   $client->avs_code(), 'Y', 'AVS code is a string';
+is   $client->cvv2_response(), 'M', 'CVV2 code is a string';
 is   $client->transaction_type(), $data->{type}, 'Type matches';
 is   $client->login(), $username, 'Login matches';
 is   $client->password(), $password, 'Password matches';
