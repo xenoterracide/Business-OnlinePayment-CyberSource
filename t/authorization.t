@@ -7,8 +7,8 @@ use warnings;
 use Test::More;
 
 BEGIN {
-	my $username = $ENV{BOPC_UN};
-	my $password = $ENV{BOPC_PW};
+	my $username = $ENV{PERL_BUSINESS_CYBERSOURCE_USERNAME};
+	my $password = $ENV{PERL_BUSINESS_CYBERSOURCE_PASSWORD};
 
 	plan skip_all =>
 		'No credentials set in the environment.  Set BOPC_UN and BOPC_PW to run this test.'
@@ -21,8 +21,8 @@ my $engine        = 'CyberSource';
 use_ok "${class}::$engine";
 
 my $client        = new_ok $class, [ $engine ];
-my $username      = $ENV{BOPC_UN};
-my $password      = $ENV{BOPC_PW};
+my $username      = $ENV{PERL_BUSINESS_CYBERSOURCE_USERNAME};
+my $password      = $ENV{PERL_BUSINESS_CYBERSOURCE_PASSWORD};
 
 my $data          = {
 	login           => $username,
