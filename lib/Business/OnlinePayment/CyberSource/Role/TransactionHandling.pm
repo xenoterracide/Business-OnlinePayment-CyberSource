@@ -50,7 +50,7 @@ sub submit             {
 	};
 
 	# Other fields
-	$data->{comment} = $content->{description} if $content->{description};
+	$data->{comments} = $content->{description} if $content->{description};
 
 	$self->transaction_type( $content->{type} );
 
