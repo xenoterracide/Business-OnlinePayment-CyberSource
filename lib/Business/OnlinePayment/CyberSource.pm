@@ -33,117 +33,6 @@ sub BUILD {
 	return;
 }
 
-# Builds a action mapping
-# Accepts:  Nothing
-# Returns:  A reference to a hash of action mappings
-
-sub _build_action_map { ## no critic ( Subroutines::ProhibitUnusedPrivateSubroutines )
-	my ( undef ) = @_;
-
-	my $map      = {
-		'normal authorization' => [ 'ccAuthService_run', 'ccCaptureService_run' ],
-		'authorization only'   => ['ccAuthService_run'],
-		'post authorization'   => ['ccCaptureService_run'],
-		'credit'               => ['ccCreditService_run'],
-		'void authorization' => ['ccAuthReversalService_run'],
-		'recurring authorization' => [],
-		'modify recurring authorization' => [],
-		'cancel recurring authorization' => [],
-	};
-
-	return $map;
-}
-
-# Builds a fields map
-# Accepts:  Nothing
-# Returns:  A reference to a hash of field mappings
-
-sub _build_field_map { ## no critic ( Subroutines::ProhibitUnusedPrivateSubroutines )
-
-	my ( undef ) = @_;
-
-	my $map      = {
-		required => {
-			all    => [ qw(
-				login
-				password
-				type
-				action
-				amount
-			) ],
-			CC     => [ qw (
-card_number
-expiration
-cvv2
-card_token
-			) ],
-			ECHECK => [ qw(
-				account_number
-				routing_code
-				account_type
-				account_name
-				bank_name
-				bank_city
-				bank_state
-				check_type
-				customer_org
-				customer_ssn
-				license_num
-				license_dob
-			) ],
-			LEC    => [ qw() ],
-		},
-		optional => {
-			all    => [ qw(
-				description
-				invoice_number
-				po_number
-				tax
-				freight
-				duty
-				tax_exempt
-				currency
-				interval
-				start
-				periods
-			) ],
-			contact => [ qw(
-				customer_id
-				name
-				first_name
-				last_name
-				company
-				address
-				city
-				state
-				zip
-				country
-				ship_first_name
-				ship_last_name
-				ship_company
-				ship_address
-				ship_city
-				ship_state
-				ship_zip
-				ship_country
-				phone
-				fax
-				email
-				customer_ip
-			) ],
-			CC     => [ qw(
-				track1
-				track2
-				recurring_billing
-			) ],
-			ECHECK => [ qw() ],
-			LEC    => [ qw() ],
-		},
-	};
-
-	return $map;
-}
-
 #### Object Attributes ####
 
 #### Applied Roles ####
@@ -162,211 +51,118 @@ __PACKAGE__->meta->make_immutable();
 
 =head1 SYNOPSIS
 
-  use Business::OnlinePayment;
+	use Business::OnlinePayment;
 
-  ####
-  # One step transaction, the simple case.
-  ####
+	my $tx = Business::OnlinePayment->new( "CyberSource" );
+	$tx->content(
+		login          => 'username',
+		password       => 'password',
+		type           => 'CC',
+		action         => 'Normal Authorization',
+		invoice_number => '00000001',
+		first_name     => 'Peter',
+		last_name      => 'Bowen',
+		address        => '123 Anystreet',
+		city           => 'Orem',
+		state          => 'Utah',
+		zip            => '84097',
+		country        => 'US',
+		email          => 'foo@bar.net',
+		card_number    => '4111111111111111',
+		expiration     => '09/06',
+		cvv2           => '1234', #optional
+		amount         => '5.00',
+		currency       => 'USD',
+	);
 
-  my $tx = Business::OnlinePayment->new("CyberSource",
-                                       conf_file => '/path/to/cybs.ini'");
-  $tx->content(
-             type           => 'VISA',
-             action         => 'Normal Authorization',
-             invoice_number => '00000001',
-             items          => [{'number'     => 0,
-                                 'name'       => 'Test 1',
-                                 'quantity'   => 1,
-                                 'unit_price' => '25.00'},
-                                {'number'     => 1,
-                                 'name'       => 'Test 2',
-                                 'quantity'   => 1,
-                                 'unit_price' => '50.00'},
-                                {'number'     => 3,
-                                 'name'       => '$5 off',
-                                 'type'       => 'COUPON',
-                                 'quantity'   => 1,
-                                 'unit_price' => '5.00'},
-                                ],
-             first_name     => 'Peter',
-             last_name      => 'Bowen',
-             address        => '123 Anystreet',
-             city           => 'Orem',
-             state          => 'UT',
-             zip            => '84097',
-             country        => 'US',
-             email          => 'foo@bar.net',
-             card_number    => '4111 1111 1111 1111',
-             expiration     => '0906',
-             cvv2           => '1234', #optional
-             referer        => 'http://valid.referer.url/',
-             user           => 'cybesource_user',
-             fraud_check    => 'true',
-             fraud_threshold => '90',
-  );
-  $tx->submit();
+	$tx->submit();
 
-  if($tx->is_success()) {
-      print "Card processed successfully: ".$tx->authorization."\n";
-  } else {
-      print "Card was rejected: ".$tx->error_message."\n";
-  }
+	if($tx->is_success()) {
+		print "Card processed successfully: ".$tx->authorization."\n";
+	} else {
+		print "Card was rejected: ".$tx->error_message."\n";
+	}
 
-  ####
-  # Two step transaction, authorization and capture.
-  # If you don't need to review order before capture, you can
-  # process in one step as above.
-  ####
+	####
+	# Two step transaction, authorization and capture.
+	# If you don't need to review order before capture, you can
+	# process in one step as above.
+	####
 
-  my $tx = Business::OnlinePayment->new("CyberSource",
-                                       conf_file => '/path/to/cybs.ini'");
-  $tx->content(
-             type           => 'VISA',
-             action         => 'Authorization Only',
-             invoice_number => '00000001',
-             items          => [{'number'   => 0,
-                                 'name'     => 'iPod Mini',
-                                 'quantity' => 1,
-                                 'unit_price' => '25.00'},
-                                {'number'   => 1,
-                                 'name'     => 'Extended Warranty',
-                                 'quantity' => 1,
-                                 'unit_price' => '50.00'},
-                                ],
-             first_name     => 'Peter',
-             last_name      => 'Bowen',
-             address        => '123 Anystreet',
-             city           => 'Orem',
-             state          => 'UT',
-             zip            => '84097',
-             country        => 'US',
-             email          => 'foo@bar.net',
-             card_number    => '4111 1111 1111 1111',
-             expiration     => '0906',
-             cvv2           => '1234', #optional
-             referer        => 'http://valid.referer.url/',
-             user           => 'cybesource_user',
-             fraud_check    => 'true',
-             fraud_threshold => '90',
-  );
-  $tx->submit();
+	my $tx = Business::OnlinePayment->new("CyberSource",
+	$tx->content(
+		login          => 'username',
+		password       => 'password',
+		type           => 'CC',
+		action         => 'Authorization Only',
+		invoice_number  => 44544,
+		description     => 'Business::OnlinePayment visa test',
+		amount          => '42.39',
+		first_name      => 'Tofu',
+		last_name       => 'Beast',
+		address         => '123 Anystreet',
+		city            => 'Anywhere',
+		state           => 'Utah',
+		zip             => '84058',
+		country         => 'US',
+		email           => 'tofu@beast.org',
+		card_number     => '4111111111111111',
+		expiration      => '12/25',
+		cvv2            => 1111,
+	);
+	$tx->submit();
 
-  if($tx->is_success()) {
-      # get information about authorization
-      $authorization = $tx->authorization
-      $order_number = $tx->order_number;
-      $security_key = $tx->security_key;
-      $avs_code = $tx->avs_code; # AVS Response Code
-      $cvv2_response = $tx->cvv2_response; # CVV2/CVC2/CID Response Code
-      $cavv_response = $tx->cavv_response; # Cardholder Authentication
-                                           # Verification Value (CAVV) Response
-                                           # Code
+	if($tx->is_success()) {
+		# get information about authorization
+		$authorization = $tx->authorization
+		$order_number = $tx->order_number;
+		$avs_code = $tx->avs_code; # AVS Response Code
+		$cvv2_response = $tx->cvv2_response; # CVV2/CVC2/CID Response Code
 
-      # now capture transaction
-      my $capture = new Business::OnlinePayment("CyberSource");
+		# now capture transaction
 
-      $capture->content(
-          action              => 'Post Authorization',
-          order_number        => $order_number,
-          merchant_descriptor => 'IPOD MINI',
-          amount              => '75.00',
-          security_key        => $security_key,
-      );
+		$tx->content(
+			login          => 'username',
+			password       => 'password',
+			type           => 'CC',
+			action         => 'Post Authorization',
+			invoice_number => 44544,
+			amount         => '42.39',
+			po_number       => $client->order_number(),
+		);
 
-      $capture->submit();
+		$tx->submit();
 
-      if($capture->is_success()) {
-          print "Card captured successfully: ".$capture->authorization."\n";
-      } else {
-          print "Card was rejected: ".$capture->error_message."\n";
-      }
+		if($capture->is_success()) {
+			print "Card captured successfully: ".$capture->authorization."\n";
+		} else {
+			print "Card was rejected: ".$capture->error_message."\n";
+		}
 
-  } else {
-      print "Card was rejected: ".$tx->error_message."\n";
-  }
+	} else {
+		print "Card was rejected: ".$tx->error_message."\n";
+	}
 
 =head1 DESCRIPTION
 
 For detailed information see L<Business::OnlinePayment>.
 
-=head1 API
-
-=over 4
-
-=item C<load_config()>
-
-loads C<cybs.ini>
-
-=item C<map_fields>
-
-=item C<request_merge>
-
-=item C<set_defaults>
-
-=back
-
 =head1 SUPPORTED TRANSACTION TYPES
 
-=head2 Visa, MasterCard, American Express, Discover
+=head2 CC
 
 Content required: type, login, action, amount, first_name, last_name, card_number, expiration.
-
-=head2 Full Name vs. First & Last
-
-Unlike Business::OnlinePayment, Business::OnlinePayment::CyberSource
-requires separate first_name and last_name fields.  I should probably
-Just split them apart.  If you feel industrious...
 
 =head2 Settling
 
 To settle an authorization-only transaction (where you set action to
-'Authorization Only'), submit the request ID code in the field
-"order_number" with the action set to "Post Authorization".
+C<Authorization Only>), submit the C<order_number> code in the field
+C<po_number> with the action set to C<Post Authorization>.
 
 You can get the transaction id from the authorization by calling the
-order_number method on the object returned from the authorization.
+C<order_number> method on the object returned from the authorization.
 You must also submit the amount field with a value less than or equal
 to the amount specified in the original authorization.
-
-=head2 Items
-
-Item fields map as follows:
-
-=over
-
-=item *
-
-productCode -> type
-
-(adult_content, coupon, default, electronic_good, electronic_software, gift_certificate, handling_only, service, shipping_and_handling, shipping_only, stored_value, subscription)
-
-=item *
-
-productSKU  -> SKU
-
-=item *
-
-productName -> name
-
-=item *
-
-quantity    -> quantity
-
-=item *
-
-taxAmount   -> tax
-
-=item *
-
-unitPrice   -> unit_price
-
-=back
-
-See the Cybersource documentation for the significance of these fields (type can be confusing)
-
-=head1 COMPATIBILITY
-
-This module implements the Simple Order API 1.x from Cybersource.
 
 =head1 ACKNOWLEDGMENTS
 
@@ -390,20 +186,6 @@ Adding Request Token Requirements (Among other significant improvements... )
 
 =head1 SEE ALSO
 
-perl(1). L<Business::OnlinePayment>.
-
-=head1 TODO
-
-=over 4
-
-=item Full Documentation
-
-=item Electronic Checks
-
-=item Pay Pal
-
-=item Full support including Level III descriptors
-
-=back
+L<Business::OnlinePayment>
 
 =cut
