@@ -94,6 +94,11 @@ sub submit             {
 		when ( /^normal\ authorization$/ix ) {
 			$result = $self->sale( $data );
 		}
+		when ( /^post\ authorization$/ix ) {
+			$data->{service} = { request_id => $content->{request_id} };
+
+			$result = $self->capture( $data );
+		}
 		default {
 			Exception::Base->throw( "$_ is an invalid action" );
 		}
@@ -128,6 +133,7 @@ has _client => (
 		|password
 		| error_message
 		| failure_status
+		| capture
 	)$/x,
 	init_arg  => undef,
 	lazy      => 1,
