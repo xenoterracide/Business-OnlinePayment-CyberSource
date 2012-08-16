@@ -48,7 +48,7 @@ my $success       = $client->submit();
 	my $options = {
 		login => $data->{login},
 		password => $data->{password},
-		invoice_number  => $data->{reference_code},
+		invoice_number  => $data->{invoice_number},
 		action          => 'Post Authorization',
 		type            => $data->{type},
 		amount          => $data->{amount},
@@ -64,7 +64,7 @@ my $success       = $client->submit();
 
 	is   $client->is_success(), $success, 'Success matches';
 
-	is   $client->order_number(), $options->{service}->{request_id},
+	like $client->order_number(), qr/^\w+$/x,
 	'Order number matches';
 
 	is   $client->response_code(), 200, 'Response code is 200';
@@ -77,7 +77,7 @@ my $success       = $client->submit();
 	is   $client->server(), 'ics2wstest.ic3.com', 'Server matches';
 	is   $client->port(), 443, 'Port matches';
 	is   $client->path(), 'commerce/1.x/transactionProcessor', 'Path matches';
-	is   $client->reference_code(), $options->{reference_code}, 'Reference code matches';
+	is   $client->invoice_number(), $options->{invoice_number}, 'Invoice number matches';
 }
 else {
 	BAIL_OUT "Could not authorize successfully!\n" . $client->error_message();
