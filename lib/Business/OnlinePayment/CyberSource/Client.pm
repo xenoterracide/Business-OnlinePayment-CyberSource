@@ -24,8 +24,24 @@ use MooseX::Types::Common::String qw(NonEmptySimpleStr);
 # Accepts:  A hash or reference to a hash of request parameters
 # Returns:  1 if the transaction was successful and 0 otherwise
 
-sub authorize          {
+sub authorize {
 	my ( $self, @args ) = @_;
+
+	my $class = 'Business::CyberSource::Request::Authorization';
+
+	return $self->_authorize( $class, @args );
+}
+
+sub sale {
+	my ( $self, @args ) = @_;
+
+	my $class = 'Business::CyberSource::Request::Sale';
+
+	return $self->_authorize( $class, @args );
+}
+
+sub _authorize          {
+	my ( $self, $class, @args ) = @_;
 	my $data            = $self->_parse_input( @args );
 	my $success         = 0;
 
@@ -49,7 +65,7 @@ sub authorize          {
 	$self->reference_code( $data->{reference_code} );
 
 	my $request         = try {
-		load_class( 'Business::CyberSource::Request::Authorization' )->new( $data );
+		load_class( $class )->new( $data );
 	}
 	catch {
 		$message = shift;
