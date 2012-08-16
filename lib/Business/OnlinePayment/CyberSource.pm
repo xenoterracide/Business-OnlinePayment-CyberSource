@@ -395,7 +395,7 @@ See the Cybersource documentation for the significance of these fields (type can
 
 This module implements the Simple Order API 1.x from Cybersource.
 
-=head1 THANK YOU
+=head1 ACKNOWLEDGMENTS
 
 =over 4
 
