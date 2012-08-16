@@ -54,34 +54,36 @@ sub submit             {
 
 	$self->transaction_type( $content->{type} );
 
-	given ( $content->{type} ) {
-		  when ( /^CC$/x ) {
-			#Credit Card information
-			my $year                 = 0;
-			my $month                = 0;
-			my $day                  = 0;
+	if ( $content->{action} =~ qr/^authorization\ only|normal\ authorization$/ix ) {
+		given ( $content->{type} ) {
+			  when ( /^CC$/x ) {
+				#Credit Card information
+				my $year                 = 0;
+				my $month                = 0;
+				my $day                  = 0;
 
-			$content->{expiration}     = ''
-				unless $content->{expiration};
+				$content->{expiration}     = ''
+					unless $content->{expiration};
 
-			if ( $content->{expiration} =~ /^\d{4}-\d{2}-\d{2}\b/x ) {
-				( $year, $month, $day ) = split '-', $content->{expiration};
+				if ( $content->{expiration} =~ /^\d{4}-\d{2}-\d{2}\b/x ) {
+					( $year, $month, $day ) = split '-', $content->{expiration};
+				}
+				elsif ( $content->{expiration} =~ /^\d{2}\/\d{2,4}$/x ) {
+					( $month, $year )       = split '/', $content->{expiration};
+				}
+
+				$year += 2000 if ( $year < 100 && $year > 0 );
+
+				$data->{card}->{account_number} = $content->{card_number};
+
+				$data->{card}->{expiration} = { year => $year, month => $month }
+					if ( $month && $year );
+
+				$data->{card}->{security_code} = $content->{cvv2} if $content->{cvv2};
 			}
-			elsif ( $content->{expiration} =~ /^\d{2}\/\d{2,4}$/x ) {
-				( $month, $year )       = split '/', $content->{expiration};
+			default {
+				Exception::Base->throw("$_ is an invalid payment type");
 			}
-
-			$year += 2000 if ( $year < 100 && $year > 0 );
-
-			$data->{card}->{account_number} = $content->{card_number};
-
-			$data->{card}->{expiration} = { year => $year, month => $month }
-				if ( $month && $year );
-
-			$data->{card}->{security_code} = $content->{cvv2} if $content->{cvv2};
-		}
-		default {
-			Exception::Base->throw("$_ is an invalid payment type");
 		}
 	}
 
