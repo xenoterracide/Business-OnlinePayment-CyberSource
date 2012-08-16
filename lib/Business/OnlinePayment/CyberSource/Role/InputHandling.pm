@@ -16,7 +16,7 @@ use Moose::Role;
 # Accepts:  A hash or reference to a hash
 # Returns:  A reference to the supplied hash
 
-sub _parse_input {
+sub _parse_input { ## no critic ( Subroutines::ProhibitUnusedPrivateSubroutines )
 	my ( undef, @args ) = @_;
 	my $data            = {};
 

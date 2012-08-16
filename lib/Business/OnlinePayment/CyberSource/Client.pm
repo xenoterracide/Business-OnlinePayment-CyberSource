@@ -72,7 +72,11 @@ sub authorize          {
 			$self->order_number( $response->request_id() );
 			$self->response_code( $res->code() );
 			$self->response_page( $res->content() );
-			$self->response_headers( { map { $_ => $res->headers->header( $_ ) } $res->headers->header_field_names() } );
+			$self->response_headers({
+					map { ## no critic ( BuiltinFunctions::ProhibitVoidMap )
+						$_ => $res->headers->header( $_ )
+					} $res->headers->header_field_names()
+				} );
 
 			$self->cvv2_code( $response->cv_code() ) if $response->has_cv_code();
 		}
@@ -149,7 +153,7 @@ sub _clear_fields      {
 # Accepts:  Nothing
 # Returns:  A reference to a Business::CyberSource::Client object
 
-sub _build_client {
+sub _build_client { ## no critic ( Subroutines::ProhibitUnusedPrivateSubroutines )
 	my ( $self )             = @_;
 	my $username             = $self->login();
 	my $password             = $self->password();
