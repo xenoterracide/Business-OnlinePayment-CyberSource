@@ -29,21 +29,21 @@ sub authorize          {
 	my $success         = 0;
 
 	# Validate input
-	my $message;
+	my $error_message;
 
-	$message            = 'No request data specified to authorize'
+	$error_message      = 'No request data specified to authorize'
 		if scalar keys $data == 0;
 
-	$message            = 'purchase_totals data must be specified to authorize as a hashref'
+	$error_message      = 'purchase_totals data must be specified to authorize as a hashref'
 		unless $data->{purchase_totals} && ref $data->{purchase_totals} eq 'HASH';
 
-	$message            = 'No payment medium specified to authorize'
+	$error_message      = 'No payment medium specified to authorize'
 		unless $data->{card};
 
-	$message            = 'No reference code specified to authorize'
+	$error_message      = 'No reference code specified to authorize'
 		unless $data->{reference_code};
 
-	Exception::Base->throw( $message ) if $message;
+	Exception::Base->throw( $error_message ) if $error_message;
 
 	$self->reference_code( $data->{reference_code} );
 
