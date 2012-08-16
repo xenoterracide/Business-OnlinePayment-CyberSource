@@ -88,7 +88,7 @@ sub submit             {
 	my $result                   = 0;
 
 	given ( $content->{action} ) {
-		  when ( /^normal\sauthorization$/ix ) {
+		  when ( /^authorization\ only$/ix ) {
 			$result = $self->authorize( $data );
 		}
 		default {
