@@ -52,7 +52,7 @@ my $success       = $client->submit();
 		action          => 'Post Authorization',
 		type            => $data->{type},
 		amount          => $data->{amount},
-		request_id      => $client->order_number(),
+		po_number       => $client->order_number(),
 	};
 
 	$client->content( %$options );
