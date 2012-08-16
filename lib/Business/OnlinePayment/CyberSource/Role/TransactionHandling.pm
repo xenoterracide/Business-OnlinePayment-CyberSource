@@ -100,7 +100,7 @@ sub submit             {
 }
 
 #### Object Attributes ####
-
+## no critic ( RegularExpressions::ProhibitComplexRegexes )
 has _client => (
 	isa       => 'Business::OnlinePayment::CyberSource::Client',
 	is        => 'bare',
