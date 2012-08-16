@@ -32,7 +32,7 @@ my $data          = {
 	type            => 'CC',
 	action          => 'Normal Authorization',
 	description     => 'Business::OnlinePayment visa test',
-	amount          => '49.95',
+	amount          => '9000',
 	invoice_number  => '100100',
 	first_name      => 'Tofu',
 	last_name       => 'Beast',
@@ -44,10 +44,13 @@ my $data          = {
 	email           => 'tofu@beast.org',
 	card_number     => '4111111111111111',
 	expiration      => '12/25',
+	cvv2 => 1111,
 };
 
 $client->content( %$data );
 $client->test_transaction(1);    # test, dont really charge
+
+$ENV{PERL_BUSINESS_CYBERSOURCE_DEBUG} = 1;
 
 my $success       = $client->submit();
 
