@@ -62,7 +62,7 @@ sub submit             {
 
 	$self->transaction_type( $content->{type} );
 
-	if ( $content->{action} =~ qr/^authorization\ only|normal\ authorization$/ix ) {
+	if ( $content->{action} =~ qr/^authorization\ only|normal\ authorization|credit$/ix ) {
 		given ( $content->{type} ) {
 			  when ( /^CC$/x ) {
 				#Credit Card information
@@ -113,6 +113,9 @@ sub submit             {
 		when ( /^void$/ix ) {
 			$result = $self->auth_reversal( $data );
 		}
+		when ( /^credit$/ix ) {
+			$result = $self->credit( $data );
+		}
 		default {
 			Exception::Base->throw( "$_ is an invalid action" );
 		}
@@ -149,6 +152,7 @@ has _client => (
 		| failure_status
 		| capture
 		|invoice_number
+		|credit
 	)$/x,
 	init_arg  => undef,
 	lazy      => 1,

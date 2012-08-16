@@ -190,12 +190,60 @@ sub credit             {
 	my $data            = $self->_parse_input( @args );
 	my $success         = 0;
 
-	my $request         = Business::CyberSource::Request::Credit->new( $data );
-	my $response        = $self->run_transaction( $data );
+	#Validate input
+	my $message         = '';
 
-	if ( 0 ) {
-		;
+	$message = 'No reference code supplied to credit'
+		unless $data->{reference_code};
+
+	$message = 'No bill_to supplied to credit'
+		unless $data->{bill_to};
+
+	$message = 'No purchase totals supplied to capture'
+		unless $data->{purchase_totals};
+
+	Exception::Base->throw( $message ) if $message;
+
+	my $request         = try {
+		load_class( 'Business::CyberSource::Request::Credit' )->new( $data );
 	}
+	catch {
+		$message          = shift;
+
+		$self->set_error_message( "$message" );
+
+		return $success;
+	};
+
+	return $request unless $request;
+
+	try {
+		my $response      = $self->run_transaction( $request );
+
+		if ( $response->is_success() ) {
+			my $res         = $response->trace->response();
+
+			$success        = 1;
+
+			$self->is_success ( $success );
+			$self->order_number( $response->request_id() );
+			$self->response_code( $res->code() );
+			$self->response_page( $res->content() );
+			$self->response_headers({
+					map { ## no critic ( BuiltinFunctions::ProhibitVoidMap )
+						$_ => $res->headers->header( $_ )
+					} $res->headers->header_field_names()
+				} );
+		}
+		else {
+			$self->set_error_message( $response->reason_text() );
+		}
+	}
+	catch {
+		$message       = shift;
+
+		$self->set_error_message( "$message" );
+	};
 
 	return $success;
 }
