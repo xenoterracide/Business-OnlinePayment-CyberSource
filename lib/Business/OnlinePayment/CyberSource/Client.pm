@@ -197,6 +197,7 @@ sub _build_client { ## no critic ( Subroutines::ProhibitUnusedPrivateSubroutines
 		username               => $username,
 		password               => $password,
 		production             => ! $test,
+		rules                  => [],
 	};
 
 	my $client               = Business::CyberSource::Client->new( $data );
