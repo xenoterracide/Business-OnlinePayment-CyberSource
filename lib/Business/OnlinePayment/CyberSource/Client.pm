@@ -7,6 +7,7 @@ use warnings;
 use Moose;
 use Data::Dump 'dump';
 use MooseX::Aliases;
+use MooseX::StrictConstructor;
 use Try::Tiny;
 use Business::CyberSource::Client;
 use MooseX::Types::CyberSource qw(AVSResult);
@@ -133,14 +134,18 @@ sub capture            {
 		my $response      = $self->run_transaction( $request );
 
 		if ( $response->is_success() ) {
+			$success        = 1;
+
+			$self->is_success ( $success );
 		}
 		else {
+			$self->set_error_message( $response->reason_text() );
 		}
 	}
 	catch {
 		my $message       = shift;
 
-		$self->error_message( "$message" );
+		$self->set_error_message( "$message" );
 	};
 
 	return $success;
