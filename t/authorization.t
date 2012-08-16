@@ -5,6 +5,7 @@ use strict;
 use warnings;
 
 use Test::More;
+use Class::Load 0.20 qw( load_class );
 
 my $username = $ENV{PERL_BUSINESS_CYBERSOURCE_USERNAME};
 my $password = $ENV{PERL_BUSINESS_CYBERSOURCE_PASSWORD};
@@ -15,12 +16,7 @@ plan skip_all
 	. 'PERL_BUSINESS_CYBERSOURCE_PASSWORD to run this test.'
 	unless ( $username && $password );
 
-my $class         = 'Business::OnlinePayment';
-my $engine        = 'CyberSource';
-
-use_ok "${class}::$engine";
-
-my $client        = new_ok $class, [ $engine ];
+my $client = new_ok( load_class('Business::OnlinePayment'), [ 'CyberSource' ]);
 
 my $data          = {
 	login           => $username,
