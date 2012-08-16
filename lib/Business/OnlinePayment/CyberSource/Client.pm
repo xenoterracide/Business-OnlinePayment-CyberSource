@@ -30,21 +30,21 @@ sub authorize          {
 	my $success         = 0;
 
 	# Validate input
-	my $error_message;
+	my $message;
 
-	$error_message      = 'No request data specified to authorize'
+	$message      = 'No request data specified to authorize'
 		if scalar keys $data == 0;
 
-	$error_message      = 'purchase_totals data must be specified to authorize as a hashref'
+	$message      = 'purchase_totals data must be specified to authorize as a hashref'
 		unless $data->{purchase_totals} && ref $data->{purchase_totals} eq 'HASH';
 
-	$error_message      = 'No payment medium specified to authorize'
+	$message      = 'No payment medium specified to authorize'
 		unless $data->{card};
 
-	$error_message      = 'No reference code specified to authorize'
+	$message      = 'No reference code specified to authorize'
 		unless $data->{reference_code};
 
-	Exception::Base->throw( $error_message ) if $error_message;
+	Exception::Base->throw( $message ) if $message;
 
 	$self->reference_code( $data->{reference_code} );
 
@@ -52,7 +52,7 @@ sub authorize          {
 		Business::CyberSource::Request::Authorization->new( $data );
 	}
 	catch {
-		my $message = shift;
+		$message = shift;
 
 		$self->set_error_message( "$message" );
 
@@ -88,7 +88,7 @@ sub authorize          {
 		}
 	}
 	catch {
-		my $message = shift;
+		$message = shift;
 
 		$self->set_error_message( "$message" );
 	};
@@ -123,7 +123,7 @@ sub capture            {
 		Business::CyberSource::Request::Capture->new( $data );
 	}
 	catch {
-		my $message       = shift;
+		$message       = shift;
 
 		$self->error_message( "$message" );
 
@@ -143,7 +143,7 @@ sub capture            {
 		}
 	}
 	catch {
-		my $message       = shift;
+		$message       = shift;
 
 		$self->set_error_message( "$message" );
 	};
@@ -202,7 +202,6 @@ sub _build_client { ## no critic ( Subroutines::ProhibitUnusedPrivateSubroutines
 		username               => $username,
 		password               => $password,
 		production             => ! $test,
-		rules                  => [],
 	};
 
 	my $client               = Business::CyberSource::Client->new( $data );
