@@ -123,7 +123,7 @@ sub capture            {
 		load_class( 'Business::CyberSource::Request::Capture' )->new( $data );
 	}
 	catch {
-		$message       = shift;
+		$message          = shift;
 
 		$self->set_error_message( "$message" );
 
@@ -134,9 +134,19 @@ sub capture            {
 		my $response      = $self->run_transaction( $request );
 
 		if ( $response->is_success() ) {
+			my $res         = $response->trace->response();
+
 			$success        = 1;
 
 			$self->is_success ( $success );
+			$self->order_number( $response->request_id() );
+			$self->response_code( $res->code() );
+			$self->response_page( $res->content() );
+			$self->response_headers({
+					map { ## no critic ( BuiltinFunctions::ProhibitVoidMap )
+						$_ => $res->headers->header( $_ )
+					} $res->headers->header_field_names()
+				} );
 		}
 		else {
 			$self->set_error_message( $response->reason_text() );
