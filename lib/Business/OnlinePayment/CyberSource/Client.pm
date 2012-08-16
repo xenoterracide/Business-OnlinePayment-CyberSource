@@ -104,12 +104,44 @@ sub capture            {
 	my $data            = $self->_parse_input( @args );
 	my $success         = 0;
 
-	my $request         = Business::CyberSource::Request::Capture->new( $data );
-	my $response        = $self->run_transaction( $data );
+	#Validate input
+	my $message         = '';
 
-	if ( 0 ) {
-		;
+	$message = 'No reference code supplied to capture'
+		unless $data->{reference_code};
+
+	$message = 'No service data supplied to capture'
+		unless $data->{service};
+
+	$message = 'No purchase totals supplied to capture'
+		unless $data->{purchase_totals};
+
+	Exception::Base->throw( $message ) if $message;
+
+	my $request         = try {
+		Business::CyberSource::Request::Capture->new( $data );
 	}
+	catch {
+		my $message       = shift;
+
+		$self->error_message( "$message" );
+
+		return $success;
+	};
+
+	try {
+		my $response      = $self->run_transaction( $request );
+
+		if ( $response->is_success() ) {
+		}
+		else {
+		}
+	}
+	catch {
+		my $message       = shift;
+
+		$self->error_message( "$message" );
+	};
 
 	return $success;
 }
