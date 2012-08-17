@@ -52,8 +52,7 @@ sub submit             {
 	$data->{service} = { request_id => $content->{po_number} }
 		if $content->{po_number};
 
-	$data->{reference_code}
-		=  $content->{invoice_number}
+	$data->{reference_code} =  $content->{invoice_number}
 		if $content->{invoice_number}
 		;
 

@@ -67,7 +67,6 @@ is   $client->require_avs(), 0, 'Require AVS matches';
 is   $client->server(), 'ics2wstest.ic3.com', 'Server matches';
 is   $client->port(), 443, 'Port matches';
 is   $client->path(), 'commerce/1.x/transactionProcessor', 'Path matches';
-is   $client->reference_code(), $data->{invoice_number}, 'Reference code matches';
 
 my %reversal_data = (
 	login          => $username,
@@ -89,6 +88,5 @@ ok $client->is_success, 'transaction successful'
 
 is $client->response_code, 200, 'response code is 200';
 like $client->order_number, qr/^\w+$/, 'order number is a string';
-is   $client->authorization, 831000, 'authorization';
 
 done_testing;

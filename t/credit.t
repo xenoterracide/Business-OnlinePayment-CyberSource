@@ -101,6 +101,5 @@ is   $client->test_transaction(), 1, 'Test transaction matches';
 is   $client->server(), 'ics2wstest.ic3.com', 'Server matches';
 is   $client->port(), 443, 'Port matches';
 is   $client->path(), 'commerce/1.x/transactionProcessor', 'Path matches';
-is   $client->invoice_number(), $data->{invoice_number}, 'Invoice number matches';
 
 done_testing;

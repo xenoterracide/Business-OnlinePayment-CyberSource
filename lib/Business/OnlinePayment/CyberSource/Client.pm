@@ -62,8 +62,6 @@ sub _authorize          {
 
 	Exception::Base->throw( $message ) if $message;
 
-	$self->invoice_number( $data->{reference_code} );
-
 	my $request         = try {
 		load_class( $class )->new( $data );
 	}
@@ -99,7 +97,6 @@ sub _authorize          {
 			$self->result_code( $response->processor_response() );
 
 			$self->cvv2_response( $response->cv_code() ) if $response->has_cv_code();
-
 		}
 		else {
 			$self->set_error_message( $response->reason_text() );
@@ -270,8 +267,6 @@ sub auth_reversal {
 		unless $data->{purchase_totals};
 
 	Exception::Base->throw( $message ) if $message;
-
-	$self->invoice_number( $data );
 
 	my $request         = try {
 		load_class( 'Business::CyberSource::Request::AuthReversal' )->new( $data );
@@ -585,18 +580,6 @@ has path => (
 	required  => 0,
 	predicate => 'has_path',
 	lazy      => 1,
-);
-
-# Murchant generated code to identify transaction
-has invoice_number => (
-	isa       => Str,
-	is        => 'rw',
-	required  => 0,
-	predicate => 'has_invoice_number',
-	clearer   => 'clear_invoice_number',
-	alias     => 'reference_code',
-	init_arg  => undef,
-	lazy      => 0,
 );
 
 #### Method Modifiers ####

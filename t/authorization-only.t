@@ -67,6 +67,5 @@ is   $client->require_avs(), 0, 'Require AVS matches';
 is   $client->server(), 'ics2wstest.ic3.com', 'Server matches';
 is   $client->port(), 443, 'Port matches';
 is   $client->path(), 'commerce/1.x/transactionProcessor', 'Path matches';
-is   $client->reference_code(), $data->{invoice_number}, 'Reference code matches';
 
 done_testing;

@@ -77,7 +77,6 @@ my $success       = $client->submit();
 	is   $client->server(), 'ics2wstest.ic3.com', 'Server matches';
 	is   $client->port(), 443, 'Port matches';
 	is   $client->path(), 'commerce/1.x/transactionProcessor', 'Path matches';
-	is   $client->invoice_number(), $options->{invoice_number}, 'Invoice number matches';
 }
 else {
 	BAIL_OUT "Could not authorize successfully!\n" . $client->error_message();
