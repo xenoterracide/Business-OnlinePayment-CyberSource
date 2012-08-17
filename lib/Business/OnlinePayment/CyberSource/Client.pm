@@ -616,20 +616,52 @@ __PACKAGE__->meta->make_immutable();
 
 =head1 SYNOPSIS
 
-  use Business::OnlinePayment::CyberSource::Request;
+  use 5.010;
+  use Business::OnlinePayment::CyberSource::Client;
 
-  my $request = Business::OnlinePayment::CyberSource::Request->new( $data );
+  my $client = Business::OnlinePayment::CyberSource::Client->new();
 
-  $request->submit();
+  my $data = {
+    invoice_number => 12345678,
+    purchase_totals => {
+      currency => 'USD',
+      total => 9000,
+    },
+    bill_to => {
+	first_name      => 'Tofu',
+	last_name       => 'Beast',
+	street1         => '123 Anystreet',
+	city            => 'Anywhere',
+	state           => 'UT',
+	postal_code             => '84058',
+	country         => 'US',
+	email           => 'tofu@beast.org',
+    },
+    card => {
+	account_number     => '4111111111111111',
+	expiration      => { month => 12, year => 2012 },
+	security_code => 1111,
+    },
+  };
 
-  if ( $request->is_success() ) {
-  	print "";
-  }
-  else {
+  $client->authorize( $data );
+
+  if ( $client->is_success() ) {
+  	say "Transaction succeeded!";
   }
 
 =head1 DESCRIPTION
 
 Business::OnlinePayment::CyberSource::Request represents a transaction request to CyberSource and provides convenience methods for encoding and decoding messages.
+
+=method authorize
+
+=method sale
+
+=method credit
+
+=method capture
+
+=method auth_reversal
 
 =cut

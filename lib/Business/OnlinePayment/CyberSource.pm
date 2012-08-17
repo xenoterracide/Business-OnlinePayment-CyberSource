@@ -89,7 +89,7 @@ __PACKAGE__->meta->make_immutable();
 	# process in one step as above.
 	####
 
-	my $tx = Business::OnlinePayment->new("CyberSource",
+  $tx = Business::OnlinePayment->new("CyberSource");
 	$tx->content(
 		login          => 'username',
 		password       => 'password',
@@ -114,10 +114,10 @@ __PACKAGE__->meta->make_immutable();
 
 	if($tx->is_success()) {
 		# get information about authorization
-		$authorization = $tx->authorization
-		$order_number = $tx->order_number;
-		$avs_code = $tx->avs_code; # AVS Response Code
-		$cvv2_response = $tx->cvv2_response; # CVV2/CVC2/CID Response Code
+		my $authorization = $tx->authorization();
+		my $order_number = $tx->order_number();
+		my $avs_code = $tx->avs_code(); # AVS Response Code();
+		my $cvv2_response = $tx->cvv2_response(); # CVV2/CVC2/CID Response Code();
 
 		# now capture transaction
 
@@ -128,19 +128,19 @@ __PACKAGE__->meta->make_immutable();
 			action         => 'Post Authorization',
 			invoice_number => 44544,
 			amount         => '42.39',
-			po_number       => $client->order_number(),
+			po_number       => $tx->order_number(),
 		);
 
 		$tx->submit();
 
-		if($capture->is_success()) {
-			print "Card captured successfully: ".$capture->authorization."\n";
+		if($tx->is_success()) {
+			print "Card captured successfully: ".$tx->authorization."\n";
 		} else {
-			print "Card was rejected: ".$capture->error_message."\n";
+			print "Card was rejected: ".$tx->error_message."\n";
 		}
 
 	} else {
-		print "Card was rejected: ".$tx->error_message."\n";
+		print "Card was rejected: " . $tx->error_message() . "\n";
 	}
 
 =head1 DESCRIPTION
@@ -163,6 +163,10 @@ You can get the transaction id from the authorization by calling the
 C<order_number> method on the object returned from the authorization.
 You must also submit the amount field with a value less than or equal
 to the amount specified in the original authorization.
+
+=method BUILD
+
+this is a before-construction hook for Moose.  You Will never call this method directly.
 
 =head1 ACKNOWLEDGMENTS
 

@@ -32,16 +32,24 @@ sub submit             {
 	$content->{currency} ||= 'USD';
 
 	# purchaser information
-	$data->{bill_to}->{ip} = $content->{customer_ip} if $content->{customer_ip};
-	$data->{bill_to}->{first_name} = $content->{first_name} if $content->{first_name};
-	$data->{bill_to}->{last_name} = $content->{last_name} if $content->{last_name};
-	$data->{bill_to}->{email} = $content->{email} if $content->{email};
-	$data->{bill_to}->{phone_number} = $content->{phone} if $content->{phone};
-	$data->{bill_to}->{street1} = $content->{address} if $content->{address};
-	$data->{bill_to}->{city} = $content->{city} if $content->{city};
-	$data->{bill_to}->{state} = $content->{state} if $content->{state};
-	$data->{bill_to}->{postal_code} = $content->{zip} if $content->{zip};
-	$data->{bill_to}->{country} = $content->{country} if $content->{country};
+	my $map = {
+		ip => 'customer_ip',
+		first_name => 'first_name',
+		last_name => 'last_name',
+		email => 'email',
+		phone_number => 'phone',
+		street1 => 'address',
+		city => 'city',
+		state => 'state',
+		postal_code => 'zip',
+		country => 'country',
+	};
+
+	foreach my $name ( keys %$map ) {
+		if ( $content->{ $map->{$name} } ) {
+			$data->{bill_to}->{$name} = $content->{ $map->{$name} };
+		}
+	}
 
 	# Purchase totals information
 	$data->{purchase_totals} = {
