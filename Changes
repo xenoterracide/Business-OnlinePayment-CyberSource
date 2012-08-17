@@ -1,6 +1,7 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+	- Refactored code to use Business::CyberSource as the underlying engine
 
 2.01      2011-07-25
 	- use dist-zilla
