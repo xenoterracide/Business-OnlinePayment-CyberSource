@@ -59,7 +59,7 @@ __PACKAGE__->meta->make_immutable();
 		password       => 'password',
 		type           => 'CC',
 		action         => 'Normal Authorization',
-		invoice_number => '00000001',
+		invoice_number => '00000001', # MurchantReferenceCode
 		first_name     => 'Peter',
 		last_name      => 'Bowen',
 		address        => '123 Anystreet',
@@ -95,7 +95,7 @@ __PACKAGE__->meta->make_immutable();
 		password       => 'password',
 		type           => 'CC',
 		action         => 'Authorization Only',
-		invoice_number  => 44544,
+		invoice_number  => 44544, # MurchantReferenceCode
 		description     => 'Business::OnlinePayment visa test',
 		amount          => '42.39',
 		first_name      => 'Tofu',
@@ -115,7 +115,7 @@ __PACKAGE__->meta->make_immutable();
 	if($tx->is_success()) {
 		# get information about authorization
 		my $authorization = $tx->authorization();
-		my $order_number = $tx->order_number();
+		my $order_number = $tx->order_number(); # RequestId
 		my $avs_code = $tx->avs_code(); # AVS Response Code();
 		my $cvv2_response = $tx->cvv2_response(); # CVV2/CVC2/CID Response Code();
 
@@ -126,15 +126,15 @@ __PACKAGE__->meta->make_immutable();
 			password       => 'password',
 			type           => 'CC',
 			action         => 'Post Authorization',
-			invoice_number => 44544,
+			invoice_number => 44544, #MurchantReferenceCode
 			amount         => '42.39',
-			po_number       => $tx->order_number(),
+			po_number       => $tx->order_number(), # RequestId
 		);
 
 		$tx->submit();
 
 		if($tx->is_success()) {
-			print "Card captured successfully: ".$tx->authorization."\n";
+			print "Funds captured successfully\n";
 		} else {
 			print "Card was rejected: ".$tx->error_message."\n";
 		}
@@ -152,6 +152,8 @@ For detailed information see L<Business::OnlinePayment>.
 =head2 CC
 
 Content required: type, login, action, amount, first_name, last_name, card_number, expiration.
+
+cvv2 is required in order to get back a cvv2_response value.
 
 =head2 Settling
 
