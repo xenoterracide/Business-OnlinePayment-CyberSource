@@ -156,7 +156,7 @@ sub capture            {
 
 			$self->is_success ( $success );
 			$self->order_number( $response->request_id() );
-			$self->response_code( $res->code() );
+			$self->response_code( $response->reason_code() );
 			$self->response_page( $res->content() );
 			$self->response_headers({
 					map { ## no critic ( BuiltinFunctions::ProhibitVoidMap )
@@ -223,7 +223,7 @@ sub credit             {
 
 			$self->is_success ( $success );
 			$self->order_number( $response->request_id() );
-			$self->response_code( $res->code() );
+			$self->response_code( $response->reason_code() );
 			$self->response_page( $res->content() );
 			$self->response_headers({
 					map { ## no critic ( BuiltinFunctions::ProhibitVoidMap )
@@ -284,7 +284,7 @@ sub auth_reversal {
 
 			$self->is_success ( $success );
 			$self->order_number( $response->request_id() );
-			$self->response_code( $res->code() );
+			$self->response_code( $response->reason_code() );
 			$self->response_page( $res->content() );
 			$self->response_headers({
 					map { ## no critic ( BuiltinFunctions::ProhibitVoidMap )
