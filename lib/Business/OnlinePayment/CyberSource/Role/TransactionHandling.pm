@@ -90,7 +90,7 @@ sub submit             {
 
 					if ( $content->{expiration} =~ /^\d{4}$/x ) {
 						$month                  = substr $content->{expiration}, 0, 2;
-						$year                   = substr $content->{expiration}, 0, 2;
+						$year                   = substr $content->{expiration}, 2, 2;
 					}
 
 					if ( $content->{expiration} =~ /^\d{4}-\d{2}-\d{2}\b/x ) {
