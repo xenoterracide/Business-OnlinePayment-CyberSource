@@ -46,8 +46,12 @@ sub submit             {
 	};
 
 	foreach my $name ( keys %$map ) {
-		if ( $content->{ $map->{$name} } ) {
-			$data->{bill_to}->{$name} = $content->{ $map->{$name} };
+		if (
+			$content->{ $map->{$name} }
+			&& $content->{action} !~ /^Post\ Authorization|Void$/ix
+		) {
+			$data->{bill_to}->{$name} = $content->{ $map->{$name} }
+				unless ( $content->{po_number} && $content->{action} =~ /^Credit$/ix );
 		}
 	}
 
