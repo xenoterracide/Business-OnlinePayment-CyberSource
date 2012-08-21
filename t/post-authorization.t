@@ -67,7 +67,7 @@ my $success       = $client->submit();
 	like $client->order_number(), qr/^\w+$/x,
 	'Order number matches';
 
-	is   $client->response_code(), 200, 'Response code is 200';
+	like $client->response_code(), qr/^\w+$/x, 'Response code is 200';
 	is   ref( $client->response_headers() ), 'HASH', 'Response headers is a hashref';
 	like $client->response_page(), qr/^.+$/sm, 'Response page is a string';
 	is   $client->login(), $username, 'Login matches';

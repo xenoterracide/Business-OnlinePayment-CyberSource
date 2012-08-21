@@ -53,7 +53,7 @@ like $client->order_number(), qr/^\w+$/, 'Order number is a string';
 ok   ! defined( $client->card_token() ), 'Card token is not defined';
 ok   ! defined( $client->fraud_score() ), 'Fraud score is not defined';
 ok   ! defined( $client->fraud_transaction_id() ), 'Fraud transaction id is not defined';
-is   $client->response_code(), 200, 'Response code is 200';
+like $client->response_code(), qr/^\w+$/x, 'Response code is 200';
 is   ref( $client->response_headers() ), 'HASH', 'Response headers is a hashref';
 like $client->response_page(), qr/^.+$/sm, 'Response page is a string';
 like $client->result_code(), qr/^\w+$/, 'Result code is a string';

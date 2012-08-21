@@ -50,7 +50,7 @@ ok $client->is_success(), 'Credit was successful'
 
 is $client->is_success(), $success, 'Success maches';
 like $client->order_number(), qr/^\w+$/x, '';
-is   $client->response_code(), 200, 'Response code is 200';
+like $client->response_code(), qr/^\w+$/x, 'Response code is 200';
 is   ref( $client->response_headers() ), 'HASH', 'Response headers is a hashref';
 like $client->response_page(), qr/^.+$/sm, 'Response page is a string';
 is   $client->transaction_type(), $data->{type}, 'Type matches';
@@ -91,7 +91,7 @@ ok $client->is_success(), 'Credit was successful'
 
 is   $client->is_success(), $success, 'Success matches';
 like $client->order_number(), qr/^\w+$/x, 'Order number is a string';
-is   $client->response_code(), 200, 'Response code is 200';
+like $client->response_code(), qr/^\w+$/x, 'Response code is 200';
 is   ref( $client->response_headers() ), 'HASH', 'Response headers is a hashref';
 like $client->response_page(), qr/^.+$/sm, 'Response page is a string';
 is   $client->transaction_type(), $data->{type}, 'Type matches';

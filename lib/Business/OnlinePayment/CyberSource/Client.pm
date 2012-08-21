@@ -86,7 +86,7 @@ sub _authorize          {
 			$self->avs_code( $response->avs_code() );
 			$self->authorization( $response->auth_code() );
 			$self->order_number( $response->request_id() );
-			$self->response_code( $res->code() );
+			$self->response_code( $response->reason_code() );
 			$self->response_page( $res->content() );
 			$self->response_headers({
 					map { ## no critic ( BuiltinFunctions::ProhibitVoidMap )
