@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-use Data::Dump 'dump';
+use DateTime;
 use Moose::Role;
 use MooseX::StrictConstructor;
 use Try::Tiny;
@@ -75,16 +75,23 @@ sub submit             {
 				#Credit Card information
 				my $year                 = 0;
 				my $month                = 0;
-				my $day                  = 0;
 
 				$content->{expiration}     = ''
 					unless $content->{expiration};
 
-				if ( $content->{expiration} =~ /^\d{4}-\d{2}-\d{2}\b/x ) {
-					( $year, $month, $day ) = split '-', $content->{expiration};
-				}
-				elsif ( $content->{expiration} =~ /^\d{2}\/\d{2,4}$/x ) {
-					( $month, $year )       = split '/', $content->{expiration};
+				if ( $content->{expiration} ) {
+    					if ( $content->{expiration} =~ /^\d{2}\/\d{2,4}$/x ) {
+						( $month, $year )       = split '/', $content->{expiration};
+					}
+
+					if ( $content->{expiration} =~ /^\d{4}$/x ) {
+						$month                  = substr $content->{expiration}, 0, 2;
+						$year                   = substr $content->{expiration}, 0, 2;
+					}
+
+					if ( $content->{expiration} =~ /^\d{4}-\d{2}-\d{2}\b/x ) {
+						( $year, $month ) = split '-', $content->{expiration};
+					}
 				}
 
 				$year += 2000 if ( $year < 100 && $year > 0 );
