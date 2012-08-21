@@ -86,14 +86,14 @@ sub _authorize          {
 			$self->avs_code( $response->avs_code() );
 			$self->authorization( $response->auth_code() );
 			$self->order_number( $response->request_id() );
-			$self->response_code( $response->reason_code() );
+			$self->response_code( $res->code() );
 			$self->response_page( $res->content() );
 			$self->response_headers({
 					map { ## no critic ( BuiltinFunctions::ProhibitVoidMap )
 						$_ => $res->headers->header( $_ )
 					} $res->headers->header_field_names()
 				} );
-			$self->result_code( $response->processor_response() );
+			$self->result_code( $response->reason_code() );
 
 			$self->cvv2_response( $response->cv_code() ) if $response->has_cv_code();
 		}
@@ -163,6 +163,7 @@ sub capture            {
 						$_ => $res->headers->header( $_ )
 					} $res->headers->header_field_names()
 				} );
+				$self->result_code( $response->reason_code() );
 		}
 		else {
 			$self->set_error_message( $response->reason_text() );
@@ -230,6 +231,7 @@ sub credit             {
 						$_ => $res->headers->header( $_ )
 					} $res->headers->header_field_names()
 				} );
+				$self->result_code( $response->reason_code() );
 		}
 		else {
 			$self->set_error_message( $response->reason_text() );
@@ -291,6 +293,7 @@ sub auth_reversal {
 						$_ => $res->headers->header( $_ )
 					} $res->headers->header_field_names()
 				} );
+				$self->result_code( $response->reason_code() );
 		}
 		else {
 			$self->set_error_message( $response->reason_text() );
