@@ -193,10 +193,12 @@ sub credit             {
 	$message = 'No reference code supplied to credit'
 		unless $data->{reference_code};
 
-	$message = 'No bill_to supplied to credit'
-		unless $data->{bill_to};
+	unless ( $data->{service} && $data->{service}->{request_id} ) {
+			$message = 'No bill_to supplied to credit'
+			unless $data->{bill_to};
+	}
 
-	$message = 'No purchase totals supplied to capture'
+	$message = 'No purchase totals supplied to credit'
 		unless $data->{purchase_totals};
 
 	Exception::Base->throw( $message ) if $message;
