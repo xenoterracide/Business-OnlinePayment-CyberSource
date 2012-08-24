@@ -77,35 +77,12 @@ sub submit             {
 		given ( $content->{type} ) {
 			  when ( /^CC$/x ) {
 				#Credit Card information
-				my $year                 = 0;
-				my $month                = 0;
-
-				$content->{expiration}     = ''
-					unless $content->{expiration};
-
-				if ( $content->{expiration} ) {
-    					if ( $content->{expiration} =~ /^\d{2}\/\d{2,4}$/x ) {
-						( $month, $year )       = split '/', $content->{expiration};
-					}
-
-					if ( $content->{expiration} =~ /^\d{4}$/x ) {
-						$month                  = substr $content->{expiration}, 0, 2;
-						$year                   = substr $content->{expiration}, 2, 2;
-					}
-
-					if ( $content->{expiration} =~ /^\d{4}-\d{2}-\d{2}\b/x ) {
-						( $year, $month ) = split '-', $content->{expiration};
-					}
-				}
-
-				$year += 2000 if ( $year < 100 && $year > 0 );
+				my $expiration = $self->_expiration_to_datetime( $content->{expiration} );
 
 				$data->{card}->{account_number} = $content->{card_number};
 
-				$data->{card}->{expiration} = { year => $year, month => $month }
-					if ( $month && $year );
-
-				$data->{card}->{security_code} = $content->{cvv2} if $content->{cvv2};
+				$data->{card}->{expiration}     = $expiration if $expiration;
+				$data->{card}->{security_code}  = $content->{cvv2} if $content->{cvv2};
 			}
 			default {
 				Exception::Base->throw("$_ is an invalid payment type");
@@ -140,6 +117,42 @@ sub submit             {
 	}
 
 	return $result;
+}
+
+# Converts an expiration date string to a DateTime object
+# Accepts:  An expiration date expressed as YYYY-MM-DD, MM/YY, or MMYY
+# Returns:  A DateTime object on success and undef otherwise
+
+sub _expiration_to_datetime {
+	my ( undef, $date ) = @_;
+	my $year            = 0;
+	my $month           = 0;
+
+	return unless defined $date;
+
+	$date               = '' unless $date;
+
+	if ( $date ) {
+  if ( $date =~ /^\d{2}\/\d{2,4}$/x ) {
+						( $month, $year )       = split '/', $date;
+					}
+
+					if ( $date =~ /^\d{4}$/x ) {
+						$month                  = substr $date, 0, 2;
+						$year                   = substr $date, 2, 2;
+					}
+
+					if ( $date =~ /^\d{4}-\d{2}-\d{2}\b/x ) {
+						( $year, $month ) = split '-', $date;
+					}
+				}
+
+	$year               = 0 if ( $year < 0 );
+	$year              += 2000 if ( $year < 100 && $year >= 0 );
+
+	my $expiration = DateTime->last_day_of_month( year => $year, month => $month );
+
+	return $expiration;
 }
 
 #### Object Attributes ####
