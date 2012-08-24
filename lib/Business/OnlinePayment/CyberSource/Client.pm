@@ -793,87 +793,87 @@ Returns:
 
 1 on success and 0 otherwise
 
-=attribute is_success
+=attr is_success
 
 use to determine whether or not the transaction succeeded
 
-=attribute authorization
+=attr authorization
 
 The authorization code supplied upon a successful authorization
 
-=attribute order_number
+=attr order_number
 
 This is the CyberSource-generated transaction identifier.  It should be used to identify subsequent transactions to authorizations.
 
 	$client->capture( { ... service => { request_id => $client->order_number() }, ... } );
 
-=attribute card_token
+=attr card_token
 
 this is currently not supported.
 
-=attribute fraud_score
+=attr fraud_score
 
 This is currently not supported
 
-=attribute fraud_transaction_id
+=attr fraud_transaction_id
 
 This is currently not supported.
 
-=attribute response_code
+=attr response_code
 
 The HTTP response code
 
-=attribute response_headers
+=attr response_headers
 
 A hash of the HTTP response headers
 
-=attribute response_page
+=attr response_page
 
 The HTTP response content
 
-=attribute result_code
+=attr result_code
 
 The processor response value
 
-=attribute avs_code
+=attr avs_code
 
 The code returned for the Address Verification Service
 
-=attribute cvv2_response
+=attr cvv2_response
 
 The CVV2 code value
 
-=attribute transaction_type
+=attr transaction_type
 
 This is the type value supplied to the content method of L<Business::OnlinePayment::CyberSource>
 
-=attribute username
+=attr username
 
 The CyberSource account username
 
-=attribute password
+=attr password
 
 The CyberSource account API key
 
-=attribute test_transaction
+=attr test_transaction
 
 Boolean value determining whether transactions should be sent as test transactions or not.
 
 This method should be called after construction but before transactions are performed, unless it is supplied to the constructor.
 
-=attribute require_avs
+=attr require_avs
 
 Boolean determining whether or not address verification should be done
 
-=attribute server
+=attr server
 
 This holds the value of the CyberSource server to which requests are being made.
 
-=attribute port
+=attr port
 
 This holds the port number on which the remote server is communicating.
 
-=attribute path
+=attr path
 
 This holds the path component of the remote service URI.
 

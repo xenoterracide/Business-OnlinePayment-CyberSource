@@ -38,7 +38,7 @@ sub _parse_input { ## no critic ( Subroutines::ProhibitUnusedPrivateSubroutines 
 
 =head1 SYNOPSIS
 
-  package Thing {
+  package Thing;
 
   use Moose;
 
@@ -50,7 +50,7 @@ sub _parse_input { ## no critic ( Subroutines::ProhibitUnusedPrivateSubroutines 
 
   	$data->{color} = 'red' unless $data->{color};
   }
-  }
+	 1;
 
   my $thing = Thing->new();
 

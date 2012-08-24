@@ -45,12 +45,12 @@ has failure_status => (
 
 =head1 SYNOPSIS
 
-  package Thing {
+  package Thing;
 
   use Moose;
 
   with 'Business::OnlinePayment::CyberSource::Role::ErrorReporting';
-  }
+  1;
 
   my $thing = Thing->new();
 

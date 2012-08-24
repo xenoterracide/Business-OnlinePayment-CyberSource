@@ -197,12 +197,12 @@ has _client => (
 
 =head1 SYNOPSIS
 
-  package Thing {
+  package Thing;
 
   use Moose;
 
   with 'Business::OnlinePayment::CyberSource::Role::TransactionHandling';
-  }
+  1;
 
 my $thing = Thing->new();
 
