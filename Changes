@@ -3,6 +3,9 @@ Revision history for {{$dist->name}}
 {{$NEXT}}
 	- Specify minimum version of Business::CyberSource as 0.006000
 
+3.000004  2012-08-30
+	- fix dependencies
+
 3.000003  2012-08-28
 	- fix licensing
 	- release to cpan
