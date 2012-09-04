@@ -6,6 +6,7 @@ use warnings;
 
 use Moose;
 use Class::Load 0.20 qw(load_class);
+use Data::Dump 'dump';
 use MooseX::Aliases;
 use MooseX::StrictConstructor;
 use Try::Tiny;
@@ -60,6 +61,10 @@ sub _authorize          {
 		unless $data->{reference_code};
 
 	Exception::Base->throw( $message ) if $message;
+
+	unless ( $self->require_avs() ) {
+		$data->{business_rules} = { ignore_avs_result => 1 };
+	}
 
 	my $request         = try {
 		load_class( $class )->new( $data );
