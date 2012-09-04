@@ -147,26 +147,26 @@ sub capture            {
 
 	try {
 		my $response      = $self->run_transaction( $request );
+		my $res         = $response->trace->response();
 
 		if ( $response->is_success() ) {
-			my $res         = $response->trace->response();
-
 			$success        = 1;
 
 			$self->is_success ( $success );
-			$self->order_number( $response->request_id() );
-			$self->response_code( $response->reason_code() );
-			$self->response_page( $res->content() );
-			$self->response_headers({
-					map { ## no critic ( BuiltinFunctions::ProhibitVoidMap )
-						$_ => $res->headers->header( $_ )
-					} $res->headers->header_field_names()
-				} );
-				$self->result_code( $response->reason_code() );
 		}
 		else {
 			$self->set_error_message( $response->reason_text() );
 		}
+
+		$self->order_number( $response->request_id() );
+		$self->response_code( $response->reason_code() );
+		$self->response_page( $res->content() );
+		$self->response_headers({
+				map { ## no critic ( BuiltinFunctions::ProhibitVoidMap )
+					$_ => $res->headers->header( $_ )
+				} $res->headers->header_field_names()
+			} );
+			$self->result_code( $response->reason_code() );
 	}
 	catch {
 		$message       = shift;
@@ -217,26 +217,26 @@ sub credit             {
 
 	try {
 		my $response      = $self->run_transaction( $request );
+		my $res         = $response->trace->response();
 
 		if ( $response->is_success() ) {
-			my $res         = $response->trace->response();
-
 			$success        = 1;
 
 			$self->is_success ( $success );
-			$self->order_number( $response->request_id() );
-			$self->response_code( $response->reason_code() );
-			$self->response_page( $res->content() );
-			$self->response_headers({
-					map { ## no critic ( BuiltinFunctions::ProhibitVoidMap )
-						$_ => $res->headers->header( $_ )
-					} $res->headers->header_field_names()
-				} );
-				$self->result_code( $response->reason_code() );
 		}
 		else {
 			$self->set_error_message( $response->reason_text() );
 		}
+
+		$self->order_number( $response->request_id() );
+		$self->response_code( $response->reason_code() );
+		$self->response_page( $res->content() );
+		$self->response_headers({
+				map { ## no critic ( BuiltinFunctions::ProhibitVoidMap )
+					$_ => $res->headers->header( $_ )
+				} $res->headers->header_field_names()
+			} );
+			$self->result_code( $response->reason_code() );
 	}
 	catch {
 		$message       = shift;
@@ -279,26 +279,26 @@ sub auth_reversal {
 
 	try {
 		my $response        = $self->run_transaction( $request );
+		my $res         = $response->trace->response();
 
 		if ( $response->is_success() ) {
-			my $res         = $response->trace->response();
-
 			$success        = 1;
 
 			$self->is_success ( $success );
-			$self->order_number( $response->request_id() );
-			$self->response_code( $response->reason_code() );
-			$self->response_page( $res->content() );
-			$self->response_headers({
-					map { ## no critic ( BuiltinFunctions::ProhibitVoidMap )
-						$_ => $res->headers->header( $_ )
-					} $res->headers->header_field_names()
-				} );
-				$self->result_code( $response->reason_code() );
 		}
 		else {
 			$self->set_error_message( $response->reason_text() );
 		}
+
+		$self->order_number( $response->request_id() );
+		$self->response_code( $response->reason_code() );
+		$self->response_page( $res->content() );
+		$self->response_headers({
+				map { ## no critic ( BuiltinFunctions::ProhibitVoidMap )
+					$_ => $res->headers->header( $_ )
+				} $res->headers->header_field_names()
+			} );
+			$self->result_code( $response->reason_code() );
 	}
 	catch {
 		$message       = shift;
