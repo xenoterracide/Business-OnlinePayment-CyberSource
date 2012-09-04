@@ -69,4 +69,56 @@ is   $client->server(), 'ics2wstest.ic3.com', 'Server matches';
 is   $client->port(), 443, 'Port matches';
 is   $client->path(), 'commerce/1.x/transactionProcessor', 'Path matches';
 
+$data->{invoice_number} += 100;
+$data->{amount} = 5005.00;
+
+$client->content( %$data );
+
+$success = $client->submit();
+
+ok     $success, 'Successful transaction';
+is     $client->response_code(), 200, 'response_code matches';
+is     $client->avs_code(), 'N', 'avs_code matches';
+is     $client->result_code(), 100, 'result_code matches';
+
+$data->{invoice_number} += 100;
+
+$client->require_avs( 1 );
+$client->content( %$data );
+
+$success = $client->submit();
+
+ok     ! $success, 'Transaction failed';
+is     $client->response_code(), 200, 'response_code matches';
+is     $client->avs_code(), 'N', 'avs_code matches';
+is     $client->result_code(), 200, 'result_code matches';
+is     $client->error_message(), 'The authorization request was approved by the issuing bank but declined by CyberSource because it did not pass the Address Verification Service (AVS) check', 'error_message matches';
+
+$data->{invoice_number} += 100;
+$data->{amount} = 3000.04;
+
+$client->require_avs( 0 );
+$client->content( %$data );
+
+$success = $client->submit();
+
+ok     ! $success, 'Transaction failed';
+is     $client->response_code(), 200, 'response_code matches';
+is     $client->avs_code(), 'Y', 'avs_code matches';
+is     $client->result_code(), 201, 'result_code matches';
+is     $client->error_message(), 'The issuing bank has questions about the request. You do not receive an authorization code programmatically, but you might receive one verbally by calling the processor', 'error_message matches';
+
+$data->{invoice_number} += 100;
+$data->{amount} = 3000.37;
+
+$client->content( %$data );
+
+$success = $client->submit();
+
+ok     ! $success, 'Transaction failed';
+is     $client->response_code(), 200, 'response_code matches';
+is     $client->avs_code(), 'Y', 'avs_code matches';
+is     $client->result_code(), 202, 'result_code matches';
+is     $client->error_message(), 'Expired card. You might also receive this if the expiration date you provided does not match the date the issuing bank has on file', 'error_message matches';
+
 done_testing;
