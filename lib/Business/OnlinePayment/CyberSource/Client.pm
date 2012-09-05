@@ -94,14 +94,19 @@ sub _authorize          {
 			$success          = 1;
 
 			$self->is_success( $success );
-			$self->authorization( $response->auth_code() );
+
+			$self->authorization( $response->auth_code() )
+				if $response->does( 'Business::CyberSource::Response::Role::Authorization' );
+
 			$self->cvv2_response( $response->cv_code() ) if $response->has_cv_code();
 		}
 		else {
 			$self->set_error_message( $response->reason_text() );
 		}
 
-		$self->avs_code( $response->avs_code() );
+		$self->avs_code( $response->avs_code() )
+			if $response->does( 'Business::CyberSource::Response::Role::AVS' );
+
 		$self->order_number( $response->request_id() );
 		$self->response_code( $res->code() );
 		$self->response_page( $res->content() );
