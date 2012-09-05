@@ -1,6 +1,8 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+
+3.000005  2012-09-04
 	- Specify minimum version of Business::CyberSource as 0.006000
 	- Set response values for success and failure
 	- Add auth failure tests
