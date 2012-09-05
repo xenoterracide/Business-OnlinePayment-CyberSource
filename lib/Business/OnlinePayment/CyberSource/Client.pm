@@ -81,7 +81,14 @@ sub _authorize          {
 
 	try {
 		my $response        = $self->run_transaction( $request );
-		my $res           = $response->trace->response();
+		my $res             = {};
+
+		if ( $response->trace() ) {
+			$res           = $response->trace->response();
+		}
+		else {
+			Exception::Base->throw( 'Request failed' );
+		}
 
 		if ( $response->is_success() ) {
 			$success          = 1;
@@ -152,7 +159,14 @@ sub capture            {
 
 	try {
 		my $response      = $self->run_transaction( $request );
-		my $res         = $response->trace->response();
+		my $res             = {};
+
+		if ( $response->trace() ) {
+			$res           = $response->trace->response();
+		}
+		else {
+			Exception::Base->throw( 'Request failed' );
+		}
 
 		if ( $response->is_success() ) {
 			$success        = 1;
@@ -164,7 +178,7 @@ sub capture            {
 		}
 
 		$self->order_number( $response->request_id() );
-		$self->response_code( $response->reason_code() );
+		$self->response_code( $res->code() );
 		$self->response_page( $res->content() );
 		$self->response_headers({
 				map { ## no critic ( BuiltinFunctions::ProhibitVoidMap )
@@ -222,7 +236,14 @@ sub credit             {
 
 	try {
 		my $response      = $self->run_transaction( $request );
-		my $res         = $response->trace->response();
+		my $res           = {};
+
+		if ( $response->trace() ) {
+			$res           = $response->trace->response();
+		}
+		else {
+			Exception::Base->throw( 'Request failed' );
+		}
 
 		if ( $response->is_success() ) {
 			$success        = 1;
@@ -234,7 +255,7 @@ sub credit             {
 		}
 
 		$self->order_number( $response->request_id() );
-		$self->response_code( $response->reason_code() );
+		$self->response_code( $res->code() );
 		$self->response_page( $res->content() );
 		$self->response_headers({
 				map { ## no critic ( BuiltinFunctions::ProhibitVoidMap )
@@ -284,7 +305,14 @@ sub auth_reversal {
 
 	try {
 		my $response        = $self->run_transaction( $request );
-		my $res         = $response->trace->response();
+		my $res             = {};
+
+		if ( $response->trace() ) {
+			$res           = $response->trace->response();
+		}
+		else {
+			Exception::Base->throw( 'Request failed' );
+		}
 
 		if ( $response->is_success() ) {
 			$success        = 1;
@@ -296,7 +324,7 @@ sub auth_reversal {
 		}
 
 		$self->order_number( $response->request_id() );
-		$self->response_code( $response->reason_code() );
+		$self->response_code( $res->code() );
 		$self->response_page( $res->content() );
 		$self->response_headers({
 				map { ## no critic ( BuiltinFunctions::ProhibitVoidMap )
