@@ -69,7 +69,7 @@ $client->content( %$data );
 $success = $client->submit();
 
 my $options = {
-	login           => $data->{username},
+	login           => $data->{login},
 	password        => $data->{password},
 	invoice_number  => $data->{invoice_number},
 	type            => $data->{type},
@@ -82,11 +82,11 @@ my $options = {
 	po_number => $client->order_number(),
 };
 
-$client->content( %$data );
+$client->content( %$options );
 
 $success       = $client->submit();
 
-ok $client->is_success(), 'Credit was successful'
+ok   $client->is_success(), 'Credit was successful'
 	or diag $client->error_message();
 
 is   $client->is_success(), $success, 'Success matches';
@@ -101,5 +101,17 @@ is   $client->test_transaction(), 1, 'Test transaction matches';
 is   $client->server(), 'ics2wstest.ic3.com', 'Server matches';
 is   $client->port(), 443, 'Port matches';
 is   $client->path(), 'commerce/1.x/transactionProcessor', 'Path matches';
+
+# Misuse case: bad reference_code
+$options->{po_number} += 500;
+$options->{amount} += 100;
+
+$client->content( %$options );
+
+$success       = $client->submit();
+
+ok   ! $success, 'Transaction failed';
+is   $client->result_code(), 102, 'result_code matches';
+is   $client->response_code(), 200, 'response_code matches';
 
 done_testing;
