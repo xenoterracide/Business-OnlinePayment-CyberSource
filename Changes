@@ -1,6 +1,9 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+	- Add conditionals to only set avs_code and authorization if the appropriate roles are applied to the response object
+	- Fix some logic errors in client object
+	- Clean up some logic to remove unnecessary variables
 
 3.000005  2012-09-04
 	- Specify minimum version of Business::CyberSource as 0.006000
