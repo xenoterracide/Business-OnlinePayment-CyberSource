@@ -94,7 +94,8 @@ sub _authorize          {
 		}
 
 		$self->avs_code( $response->avs_code() )
-			if $response->does( 'Business::CyberSource::Response::Role::AVS' );
+			if $response->does( 'Business::CyberSource::Response::Role::AVS' )
+			&& $response->has_avs_code;
 
 		$self->_fill_fields( $response );
 	}
