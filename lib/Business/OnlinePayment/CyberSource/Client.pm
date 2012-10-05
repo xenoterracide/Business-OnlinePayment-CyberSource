@@ -79,7 +79,7 @@ sub _authorize          {
 	return $request unless $request;
 
 	try {
-		my $response        = $self->run_transaction( $request );
+		my $response = $self->run_transaction( $request );
 
 		if ( $response->is_accepted() ) {
 			$self->is_success( 1 );
