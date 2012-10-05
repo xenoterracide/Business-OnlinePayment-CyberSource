@@ -1,6 +1,8 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+
+3.000006  2012-10-04
 	- Add conditionals to only set avs_code and authorization if the appropriate roles are applied to the response object
 	- Fix some logic errors in client object
 	- Clean up some logic to remove unnecessary variables
