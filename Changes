@@ -1,6 +1,7 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+	- Updated logic in Client class to rethrow exceptions thrown by the CyberSource response object
 
 3.000007  2012-10-04
 	- improve conditional checks for avs, authorization and cvcode
