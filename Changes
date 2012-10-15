@@ -1,6 +1,8 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+
+3.000009  2012-10-15
 	- Remove unneeded git remote
 
 3.000008  2012-10-15
