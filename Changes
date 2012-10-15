@@ -1,6 +1,7 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+	- Remove unneeded git remote
 
 3.000008  2012-10-15
 	- Updated logic in Client class to rethrow exceptions thrown by the CyberSource response object
