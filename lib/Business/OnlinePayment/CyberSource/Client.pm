@@ -9,7 +9,7 @@ use Class::Load 0.20 qw(load_class);
 use MooseX::Aliases;
 use MooseX::StrictConstructor;
 use Try::Tiny;
-use Business::CyberSource::Client 0.006009;
+use Business::CyberSource::Client 0.007001;
 use MooseX::Types::CyberSource qw(AVSResult);
 use MooseX::Types::Moose qw(Bool HashRef Int Str);
 use MooseX::Types::Common::String qw(NonEmptySimpleStr);
@@ -87,18 +87,14 @@ sub _authorize          {
 			$self->set_error_message( $response->reason_text() );
 		}
 
-  my $role       = 'Business::CyberSource::Response::Role::Authorization';
+		$self->authorization( $response->auth->auth_code() )
+			if $response->auth->has_auth_code;
 
-		if ( $response->does( $role ) ) {
-			$self->authorization( $response->auth_code() )
-				if $response->has_auth_code;
+		$self->cvv2_response( $response->auth->cv_code() )
+			if $response->auth->has_cv_code();
 
-			$self->cvv2_response( $response->cv_code() )
-				if $response->has_cv_code();
-
-			$self->avs_code( $response->avs_code() )
-				if $response->has_avs_code;
-		}
+		$self->avs_code( $response->auth->avs_code() )
+			if $response->auth->has_avs_code;
 
 		$self->_fill_fields( $response );
 	}
@@ -106,7 +102,7 @@ sub _authorize          {
 		my $e          = shift;
 
 		# Rethrow if $e is not a string
-		$e->throw() if ref $e ne '';
+		$e->throw() if ( ref $e ne '' );
 
   $self->set_error_message( $e );
 	};
@@ -213,6 +209,7 @@ sub credit             {
 	try {
 		my $response      = $self->run_transaction( $request );
 
+
 		if ( $response->is_accept() ) {
 			$self->is_success ( 1 );
 		}
@@ -299,11 +296,13 @@ sub _fill_fields {
 
 	return unless ( $response and $response->isa( 'Business::CyberSource::Response' ) );
 
-	if ( $response->trace() ) {
-		$res           = $response->trace->response();
+	my $trace               = $response->trace();
+
+	if ( $trace ) {
+		$res                  = $trace->response();
 	}
 	else {
-		Exception::Base->throw( 'Request failed' );
+		Exception::Base->throw( 'No trace found' );
 	}
 
 	my $h                   = $res->headers();

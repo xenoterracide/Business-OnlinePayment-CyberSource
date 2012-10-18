@@ -1,6 +1,8 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+	- Removed checking of accept role
+	- removed debugging output
 
 3.000009  2012-10-15
 	- Remove unneeded git remote
