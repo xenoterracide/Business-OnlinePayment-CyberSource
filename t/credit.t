@@ -4,8 +4,9 @@ use 5.010;
 use strict;
 use warnings;
 
-use Test::More;
 use Class::Load 0.20 qw( load_class );
+use Test::More;
+use Try::Tiny;
 
 my $username = $ENV{PERL_BUSINESS_CYBERSOURCE_USERNAME};
 my $password = $ENV{PERL_BUSINESS_CYBERSOURCE_PASSWORD};
@@ -103,15 +104,18 @@ is   $client->port(), 443, 'Port matches';
 is   $client->path(), 'commerce/1.x/transactionProcessor', 'Path matches';
 
 # Misuse case: bad reference_code
-$options->{po_number} += 500;
+$options->{po_number} .= 500;
 $options->{amount} += 100;
 
-$client->content( %$options );
+$client->content( %$options 	);
 
-$success       = $client->submit();
+$success       = try {
+	$client->submit();
+} catch {
+	my ( $e ) = @_;
 
-ok   ! $success, 'Transaction failed';
-is   $client->result_code(), 102, 'result_code matches';
-is   $client->response_code(), 200, 'response_code matches';
+	isa_ok $e, 'Business::CyberSource::Response::Exception';
+	like   "$e", qr/invalidField/x, 'Exception message matches';
+};
 
 done_testing;
