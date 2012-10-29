@@ -1,6 +1,8 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+
+3.000010  2012-10-29
 	- Removed checking of accept role
 	- removed debugging output
 
