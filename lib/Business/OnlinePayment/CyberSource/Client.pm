@@ -9,7 +9,7 @@ use Class::Load 0.20 qw(load_class);
 use MooseX::Aliases;
 use MooseX::StrictConstructor;
 use Try::Tiny;
-use Business::CyberSource::Client 0.007001;
+use Business::CyberSource::Client 0.007006;
 use MooseX::Types::CyberSource qw(AVSResult);
 use MooseX::Types::Moose qw(Bool HashRef Int Str);
 use MooseX::Types::Common::String qw(NonEmptySimpleStr);
