@@ -1,6 +1,8 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+	- Change minimum version of B::C to 0.007006
+	- Update MetaResources
 
 3.000010  2012-10-29
 	- Removed checking of accept role
