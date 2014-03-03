@@ -6,7 +6,6 @@ use warnings;
 use namespace::autoclean;
 
 use Moose;
-use Data::Dump 'dump';
 use Exception::Base;
 use MooseX::NonMoose;
 use MooseX::StrictConstructor;
