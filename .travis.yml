@@ -17,6 +17,7 @@ install:
    - cpanm --quiet --notest --with-recommends Dist::Zilla::PluginBundle::Author::XENO
    - "dzil authordeps | cpanm --quiet --notest"
    - cpanm Crypt::SSLeay
+   - cpanm Bread::Board
    - "dzil listdeps   | cpanm --verbose"
 script:
    - dzil smoke --release --author
