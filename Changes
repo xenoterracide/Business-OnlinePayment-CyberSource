@@ -2,6 +2,13 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+3.000008  2014-03-03
+	- convert to Module::Runtime
+	- use Business::CyberSource 9 API
+	- remove Data::Dump
+	- update compile-tests should fix stall on windows
+	- update metainformation
+
 3.000007  2012-10-04
 	- improve conditional checks for avs, authorization and cvcode
 
