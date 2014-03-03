@@ -5,8 +5,7 @@ use strict;
 use warnings;
 
 use Moose;
-use Class::Load 0.20 qw(load_class);
-use Data::Dump 'dump';
+use Module::Runtime qw( use_module );
 use MooseX::Aliases;
 use MooseX::StrictConstructor;
 use Try::Tiny;
@@ -66,7 +65,7 @@ sub _authorize          {
 	}
 
 	my $request         = try {
-		load_class( $class )->new( $data );
+		use_module( $class )->new( $data );
 	}
 	catch {
 		$message = shift;
@@ -137,7 +136,7 @@ sub capture            {
 	Exception::Base->throw( $message ) if $message;
 
 	my $request         = try {
-		load_class( 'Business::CyberSource::Request::Capture' )->new( $data );
+		use_module( 'Business::CyberSource::Request::Capture' )->new( $data );
 	}
 	catch {
 		$message          = shift;
@@ -195,7 +194,7 @@ sub credit             {
 	Exception::Base->throw( $message ) if $message;
 
 	my $request         = try {
-		load_class( 'Business::CyberSource::Request::Credit' )->new( $data );
+		use_module( 'Business::CyberSource::Request::Credit' )->new( $data );
 	}
 	catch {
 		$message          = shift;
@@ -251,7 +250,7 @@ sub auth_reversal {
 	Exception::Base->throw( $message ) if $message;
 
 	my $request         = try {
-		load_class( 'Business::CyberSource::Request::AuthReversal' )->new( $data );
+		use_module( 'Business::CyberSource::Request::AuthReversal' )->new( $data );
 	}
 	catch {
 		$self->set_error_message( "$_" );
