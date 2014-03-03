@@ -2,12 +2,25 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
-3.000008  2014-03-03
 	- convert to Module::Runtime
 	- use Business::CyberSource 9 API
 	- remove Data::Dump
 	- update compile-tests should fix stall on windows
 	- update metainformation
+
+3.000011  2012-11-15
+	- Change minimum version of B::C to 0.007006
+	- Update MetaResources
+
+3.000010  2012-10-29
+	- Removed checking of accept role
+	- removed debugging output
+
+3.000009  2012-10-15
+	- Remove unneeded git remote
+
+3.000008  2012-10-15
+	- Updated logic in Client class to rethrow exceptions thrown by the CyberSource response object
 
 3.000007  2012-10-04
 	- improve conditional checks for avs, authorization and cvcode

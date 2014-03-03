@@ -9,7 +9,7 @@ use Module::Runtime qw( use_module );
 use MooseX::Aliases;
 use MooseX::StrictConstructor;
 use Try::Tiny;
-use Business::CyberSource::Client;
+use Business::CyberSource::Client 0.007006;
 use MooseX::Types::CyberSource qw(AVSResult);
 use MooseX::Types::Moose qw(Bool HashRef Int Str);
 use MooseX::Types::Common::String qw(NonEmptySimpleStr);
@@ -80,34 +80,31 @@ sub _authorize          {
 	try {
 		my $response = $self->run_transaction( $request );
 
-		if ( $response->is_accepted() ) {
+		if ( $response->is_accept() ) {
 			$self->is_success( 1 );
-
 		}
 		else {
 			$self->set_error_message( $response->reason_text() );
 		}
 
-		if ( $response->does(
-				'Business::CyberSource::Response::Role::Authorization'
-				)
-			) {
-			$self->authorization( $response->auth_code() )
-				if $response->has_auth_code;
+		$self->authorization( $response->auth->auth_code() )
+			if $response->auth->has_auth_code;
 
-			$self->cvv2_response( $response->cv_code() )
-				if $response->has_cv_code();
+		$self->cvv2_response( $response->auth->cv_code() )
+			if $response->auth->has_cv_code();
 
-			$self->avs_code( $response->avs_code() )
-				if $response->has_avs_code;
-		}
+		$self->avs_code( $response->auth->avs_code() )
+			if $response->auth->has_avs_code;
 
 		$self->_fill_fields( $response );
 	}
 	catch {
-		$message = shift;
+		my $e          = shift;
 
-		$self->set_error_message( "$message" );
+		# Rethrow if $e is not a string
+		$e->throw() if ( ref $e ne '' );
+
+  $self->set_error_message( $e );
 	};
 
 	return $self->is_success();
@@ -151,7 +148,7 @@ sub capture            {
 	try {
 		my $response      = $self->run_transaction( $request );
 
-		if ( $response->is_success() ) {
+		if ( $response->is_accept() ) {
 			$self->is_success ( 1 );
 		}
 		else {
@@ -161,9 +158,12 @@ sub capture            {
 		$self->_fill_fields( $response );
 	}
 	catch {
-		$message       = shift;
+		my $e          = shift;
 
-		$self->set_error_message( "$message" );
+		# Rethrow if $e is not a string
+		$e->throw() if ref $e ne '';
+
+  $self->set_error_message( $e );
 	};
 
 	return $self->is_success();
@@ -209,7 +209,8 @@ sub credit             {
 	try {
 		my $response      = $self->run_transaction( $request );
 
-		if ( $response->is_success() ) {
+
+		if ( $response->is_accept() ) {
 			$self->is_success ( 1 );
 		}
 		else {
@@ -219,9 +220,12 @@ sub credit             {
 		$self->_fill_fields( $response );
 	}
 	catch {
-		$message       = shift;
+		my $e          = shift;
 
-		$self->set_error_message( "$message" );
+		# Rethrow if $e is not a string
+		$e->throw() if ref $e ne '';
+
+  $self->set_error_message( $e );
 	};
 
 	return $self->is_success();
@@ -261,7 +265,7 @@ sub auth_reversal {
 	try {
 		my $response        = $self->run_transaction( $request );
 
-		if ( $response->is_success() ) {
+		if ( $response->is_accept() ) {
 			$self->is_success ( 1 );
 		}
 		else {
@@ -271,9 +275,12 @@ sub auth_reversal {
 		$self->_fill_fields( $response );
 	}
 	catch {
-		$message       = shift;
+		my $e          = shift;
 
-		$self->set_error_message( "$message" );
+  # Rethrow if $e is not a string
+  $e->throw() if ref $e ne '';
+
+		$self->set_error_message( $e );
 	};
 
 	return $self->is_success();
@@ -289,11 +296,13 @@ sub _fill_fields {
 
 	return unless ( $response and $response->isa( 'Business::CyberSource::Response' ) );
 
-	if ( $response->trace() ) {
-		$res           = $response->trace->response();
+	my $trace               = $response->trace();
+
+	if ( $trace ) {
+		$res                  = $trace->response();
 	}
 	else {
-		Exception::Base->throw( 'Request failed' );
+		Exception::Base->throw( 'No trace found' );
 	}
 
 	my $h                   = $res->headers();
