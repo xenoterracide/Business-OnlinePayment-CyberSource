@@ -74,8 +74,7 @@ sub submit             {
 	$self->transaction_type( $content->{type} );
 
 	if ( $content->{action} =~ qr/^authorization\ only|normal\ authorization|credit$/ix ) {
-		given ( $content->{type} ) {
-			  when ( /^CC$/x ) {
+		if ( $content->{type} =~ /^CC$/x ) {
 				#Credit Card information
 				my $expiration = $self->_expiration_to_datetime( $content->{expiration} );
 
@@ -83,10 +82,9 @@ sub submit             {
 
 				$data->{card}->{expiration}     = $expiration if $expiration;
 				$data->{card}->{security_code}  = $content->{cvv2} if $content->{cvv2};
-			}
-			default {
+		}
+		else {
 				Exception::Base->throw("$_ is an invalid payment type");
-			}
 		}
 	}
 
@@ -95,25 +93,23 @@ sub submit             {
 
 	my $result                   = 0;
 
-	given ( $content->{action} ) {
-		when ( /^authorization\ only$/ix ) {
+	if ( $content->{action} =~ /^authorization\ only$/ix ) { ## no critic ( ControlStructures::ProhibitCascadingIfElse )
 			$result = $self->authorize( $data );
-		}
-		when ( /^normal\ authorization$/ix ) {
+	}
+	elsif ( $content->{action} =~ /^normal\ authorization$/ix ) {
 			$result = $self->sale( $data );
-		}
-		when ( /^post\ authorization$/ix ) {
+	}
+	elsif( $content->{action} =~ /^post\ authorization$/ix ) {
 			$result = $self->capture( $data );
-		}
-		when ( /^void$/ix ) {
+	}
+	elsif( $content->{action} =~ /^void$/ix ) {
 			$result = $self->auth_reversal( $data );
-		}
-		when ( /^credit$/ix ) {
+	}
+	elsif( $content->{action} =~  /^credit$/ix ) {
 			$result = $self->credit( $data );
-		}
-		default {
+	}
+	else {
 			Exception::Base->throw( "$_ is an invalid action" );
-		}
 	}
 
 	return $result;
