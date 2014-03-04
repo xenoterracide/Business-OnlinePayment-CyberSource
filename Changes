@@ -2,6 +2,9 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+3.000014  2014-03-04
+	- add conditional check to see if auth object exists
+
 3.000013  2014-03-04
 	- remove use of deprecated run_transaction API
 
