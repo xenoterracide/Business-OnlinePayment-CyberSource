@@ -2,8 +2,10 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
-3.000012  2014-03-03
+3.000013  2014-03-04
+	- remove use of deprecated run_transaction API
 
+3.000012  2014-03-03
 	- convert to Module::Runtime
 	- use Business::CyberSource 9 API
 	- remove Data::Dump
