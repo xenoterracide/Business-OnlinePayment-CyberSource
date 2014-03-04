@@ -87,15 +87,16 @@ sub _authorize          {
 			$self->set_error_message( $response->reason_text() );
 		}
 
-		$self->authorization( $response->auth->auth_code() )
-			if $response->auth->has_auth_code;
+		if ( $response->has_auth ) {
+		  $self->authorization( $response->auth->auth_code() )
+			  if $response->auth->has_auth_code;
 
-		$self->cvv2_response( $response->auth->cv_code() )
-			if $response->auth->has_cv_code();
+		  $self->cvv2_response( $response->auth->cv_code() )
+			  if $response->auth->has_cv_code();
 
-		$self->avs_code( $response->auth->avs_code() )
-			if $response->auth->has_avs_code;
-
+		  $self->avs_code( $response->auth->avs_code() )
+			  if $response->auth->has_avs_code;
+		}
 		$self->_fill_fields( $response );
 	}
 	catch {
