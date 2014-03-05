@@ -3,6 +3,7 @@ Revision history for {{$dist->name}}
 {{$NEXT}}
 
 3.000015  2014-03-04
+	- add Business::OnlinePayment 3 as a Prereq
 
 3.000014  2014-03-04
 	- add conditional check to see if auth object exists
