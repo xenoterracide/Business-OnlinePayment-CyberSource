@@ -2,6 +2,10 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+3.000016  2014-03-05
+	- finish converting to Module::Runtime
+	- require Crypt::SSLeay for tests
+
 3.000015  2014-03-04
 	- add Business::OnlinePayment 3 as a Prereq
 
