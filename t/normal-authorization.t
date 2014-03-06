@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 use Test::More;
-use Class::Load 0.20 qw( load_class );
+use Module::Runtime qw( use_module );
 
 my $username = $ENV{PERL_BUSINESS_CYBERSOURCE_USERNAME};
 my $password = $ENV{PERL_BUSINESS_CYBERSOURCE_PASSWORD};
@@ -15,7 +15,7 @@ plan skip_all => 'No credentials set in the environment.'
   . 'PERL_BUSINESS_CYBERSOURCE_PASSWORD to run this test.'
   unless ( $username && $password );
 
-my $client = new_ok( load_class('Business::OnlinePayment'), ['CyberSource'] );
+my $client = new_ok( use_module('Business::OnlinePayment'), ['CyberSource'] );
 
 my $data = {
  login          => $username,

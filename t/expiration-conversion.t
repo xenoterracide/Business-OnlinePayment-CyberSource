@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 use Test::More;
-use Class::Load 0.20 qw( load_class );
+use Module::Runtime qw( use_module );
 
-my $client = new_ok( load_class('Business::OnlinePayment'), ['CyberSource'] );
+my $client = new_ok( use_module('Business::OnlinePayment'), ['CyberSource'] );
 my $datetime = $client->_expiration_to_datetime('0416');
 
 isa_ok $datetime, 'DateTime';

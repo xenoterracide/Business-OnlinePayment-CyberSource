@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-use Class::Load 0.20 qw( load_class );
+use Module::Runtime qw( use_module );
 use Test::More;
 use Try::Tiny;
 
@@ -16,7 +16,7 @@ plan skip_all => 'No credentials set in the environment.'
   . 'PERL_BUSINESS_CYBERSOURCE_PASSWORD to run this test.'
   unless ( $username && $password );
 
-my $client = new_ok( load_class('Business::OnlinePayment'), ['CyberSource'] );
+my $client = new_ok( use_module('Business::OnlinePayment'), ['CyberSource'] );
 
 # Stand-alone credit
 my $data = {
